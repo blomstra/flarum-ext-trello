@@ -1,0 +1,40 @@
+{
+    "name": "blomstra/trello",
+    "description": "Integrate Trello into Flarum",
+    "keywords": [
+        "flarum"
+    ],
+    "type": "flarum-extension",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/blomstra/flarum-ext-trello/issues",
+        "source": "https://github.com/blomstra/flarum-ext-trello",
+        "forum": "https://blomstra.community/t/extensions"
+    },
+    "require": {
+        "flarum/core": "^1.0.0"
+    },
+    "authors": [
+        {
+            "name": "Ian Morland",
+            "email": "ian@blomstra.net",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Blomstra\\Trello\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Trello",
+            "category": "feature",
+            "icon": {
+                "name": "fab fa-trello",
+                "backgroundColor": "#EBF1FD",
+                "color": "#3a98d0"
+            }
+        }
+    }
+}

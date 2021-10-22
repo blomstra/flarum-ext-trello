@@ -1,0 +1,7 @@
+blomstra-trello:
+  admin:
+    settings:
+      api_key_help: Enter the API key in order for this extension to connect with Trello.
+      api_key_label: API Key
+
+  forum:
