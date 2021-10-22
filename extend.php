@@ -29,5 +29,8 @@ return [
     (new Extend\ApiSerializer(DiscussionSerializer::class))
         ->attribute('trelloCardId', function (DiscussionSerializer $serializer, Discussion $discussion, array $attributes) {
             return $discussion->trello_card_id;
+        })
+        ->attribute('canAddToTrello', function (DiscussionSerializer $serializer, Discussion $discussion, array $attributes) {
+            return (bool) $serializer->getActor()->can('addToTrello', $discussion);
         }),
 ];

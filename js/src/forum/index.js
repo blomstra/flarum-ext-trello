@@ -4,4 +4,5 @@ import Discussion from 'flarum/common/models/Discussion';
 
 app.initializers.add('blomstra/trello', () => {
   Discussion.prototype.trelloCardId = Model.attribute('trelloCardId');
+  Discussion.prototype.canAddToTrello = Model.attribute('canAddToTrello');
 });

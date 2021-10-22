@@ -1,5 +1,7 @@
 blomstra-trello:
   admin:
+    permissions:
+      add_to_trello: Can link a discussion to Trello
     settings:
       api_key_help: Enter the API key in order for this extension to connect with Trello.
       api_key_label: API Key
