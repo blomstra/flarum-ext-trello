@@ -1,8 +1,6 @@
 import app from 'flarum/forum/app';
-import Model from 'flarum/common/Model';
-import Discussion from 'flarum/common/models/Discussion';
+import extendDiscussions from './extend/extendDiscussions';
 
 app.initializers.add('blomstra/trello', () => {
-  Discussion.prototype.trelloCardId = Model.attribute('trelloCardId');
-  Discussion.prototype.canAddToTrello = Model.attribute('canAddToTrello');
+  extendDiscussions();
 });

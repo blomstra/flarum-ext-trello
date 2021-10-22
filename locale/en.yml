@@ -7,3 +7,7 @@ blomstra-trello:
       api_key_label: API Key
 
   forum:
+    controls:
+      send_to_trello_button: Send to Trello
+      view_on_trello: View Trello card
+
