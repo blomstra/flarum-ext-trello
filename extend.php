@@ -11,9 +11,15 @@
 
 namespace Blomstra\Trello;
 
-use Flarum\Api\Serializer\DiscussionSerializer;
-use Flarum\Discussion\Discussion;
 use Flarum\Extend;
+use Flarum\Discussion\Discussion;
+use Flarum\Api\Serializer\DiscussionSerializer;
+use Blomstra\Trello\Controllers\AddBoardController;
+use Blomstra\Trello\Controllers\ListBoardsController;
+use Blomstra\Trello\Controllers\DeleteBoardController;
+use Blomstra\Trello\Controllers\ListLanesBoardController;
+use Blomstra\Trello\Controllers\UpdateDiscussionController;
+use Blomstra\Trello\Controllers\ListDatabaseBoardController;
 
 return [
     (new Extend\Frontend('forum'))
@@ -25,6 +31,14 @@ return [
         ->css(__DIR__.'/less/admin.less'),
 
     new Extend\Locales(__DIR__.'/locale'),
+
+    (new Extend\Routes('api'))
+        ->get('/blomstra/trello/api-boards', 'blomstra::trello.boards-api.index', ListBoardsController::class)
+        ->get('/blomstra/trello/api-boards/{board}/lanes', 'blomstra::trello.boards-api.lanes.index', ListLanesBoardController::class)
+        ->get('/blomstra/trello/boards', 'blomstra::trello.boards.index', ListDatabaseBoardController::class)
+        ->post('/blomstra/trello/boards', 'blomstra::trello.boards.store', AddBoardController::class)
+        ->delete('/blomstra/trello/boards/{shortLink}', 'blomstra::trello.boards.destroy', DeleteBoardController::class)
+        ->patch('/blomstra/trello/discussions', 'blomstra::trello.discussions.update', UpdateDiscussionController::class),
 
     (new Extend\ApiSerializer(DiscussionSerializer::class))
         ->attribute('trelloCardId', function (DiscussionSerializer $serializer, Discussion $discussion, array $attributes) {

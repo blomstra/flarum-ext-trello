@@ -22,7 +22,7 @@ export default function () {
       'blomstra-trello',
       trelloId ? (
         <LinkButton className="Button" icon="fab fa-trello" href={`https://trello.com/c/${trelloId}`} external={true} target="_blank">
-          {app.translator.trans('blomstra-trello.forum.controls.view_on_trello')}
+          {app.translator.trans('blomstra-trello.forum.controls.view_on_trello_button')}
         </LinkButton>
       ) : (
         Button.component(
