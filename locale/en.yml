@@ -3,33 +3,32 @@ blomstra-trello:
     permissions:
       add_to_trello: Can link a discussion to Trello
     settings:
-      label:
-        general: General
-        boards: Boards Settings
       button:
         add: Add
         remove: Remove
-      no_selected_boards_label: No selected boards
-      no_available_boards_label: No available boards
-      selected_boards_label: Selected boards
-      available_boards_label: Available boards
+      label:
+        general: General
+        boards: Boards Settings
       api_key_help: Enter the API key in order for this extension to connect with Trello.
       api_key_label: API Key
       api_token_help: Enter the API token in order for this extension to connect with Trello.
       api_token_label: API Token
+      available_boards_label: Available boards
       member_id_help: Enter the Trello Member ID to be used for fetching organization boards with Trello. (https://trello.com/your-trello-handle)
       member_id_label: Member ID
+      no_available_boards_label: No available boards
+      no_selected_boards_label: No selected boards
+      selected_boards_label: Selected boards
 
   forum:
-    modals:
-      title: Send to Trello
-      fields:
-        board: Select a Trello board
-        lane: Select a Trello lane
-      select_a_board_label: -- Select a board --
-      no_available_boards_label: No available boards
-
     controls:
       send_to_trello_button: Send to Trello
       view_on_trello_button: View Trello card
+    modals:
+      fields:
+        board: Select a Trello board
+        lane: Select a Trello lane
+      no_available_boards_label: No available boards
+      select_a_board_label: -- Select a board --
+      title: Send to Trello
 

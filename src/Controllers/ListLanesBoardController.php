@@ -1,11 +1,21 @@
 <?php
 
+/*
+ * This file is part of blomstra/trello.
+ *
+ * Copyright (c) 2021 Blomstra Ltd.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace Blomstra\Trello\Controllers;
 
 use Exception;
 use Trello\Client;
 use Trello\Model\Board;
 use Illuminate\Support\Arr;
+use Flarum\Http\RequestUtil;
 use Tobscure\JsonApi\Document;
 use Psr\Http\Message\ServerRequestInterface;
 use Flarum\Settings\SettingsRepositoryInterface;
@@ -31,6 +41,8 @@ class ListLanesBoardController extends AbstractListController
 
     protected function data(ServerRequestInterface $request, Document $document)
     {
+        RequestUtil::getActor($request)->assertAdmin();
+
         try {
             $board = Arr::get($request->getQueryParams(), 'board');
 
