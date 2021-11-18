@@ -14,28 +14,22 @@ export default function () {
   extend(DiscussionPage.prototype, 'sidebarItems', function (items) {
     const discussion = this.discussion;
 
-    if (!discussion.canAddToTrello() || app.forum.attribute('trelloBoards').length == 0) {
+    if (!discussion.canAddToTrello() || !app.forum.attribute('trelloBoards')) {
       return;
     }
 
     const trelloId = discussion.trelloCardId();
-    const faIcon = 'fab fa-trello';
 
     items.add(
       'blomstra-trello',
       trelloId ? (
-        <LinkButton className="Button" icon="fab fa-trello" href={`https://trello.com/c/${trelloId}`} external={true} target="_blank">
+        <LinkButton class="Button" icon="fab fa-trello" href={`https://trello.com/c/${trelloId}`} external={true} target="_blank">
           {app.translator.trans('blomstra-trello.forum.controls.view_on_trello_button')}
         </LinkButton>
       ) : (
-        Button.component(
-          {
-            icon: faIcon,
-            className: 'Button',
-            onclick: () => app.modal.show(SendToTrelloModal, { discussion }),
-          },
-          app.translator.trans('blomstra-trello.forum.controls.send_to_trello_button')
-        )
+        <Button icon="fab fa-trello" className="Button" onclick={() => app.modal.show(SendToTrelloModal, { discussion })}>
+          {app.translator.trans('blomstra-trello.forum.controls.send_to_trello_button')}
+        </Button>
       )
     );
   });
