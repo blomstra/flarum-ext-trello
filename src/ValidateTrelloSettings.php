@@ -12,9 +12,7 @@ class ValidateTrelloSettings
         $apiToken = $settings->get('blomstra-trello.api_token');
         $memberId = $settings->get('blomstra-trello.member_id');
 
-        if (self::areInvalidSettings([$apiKey, $apiToken, $memberId])) {
-            return false;
-        }
+        return !self::areInvalidSettings([$apiKey, $apiToken, $memberId]);
     }
 
     static private function isInvalidSetting(mixed $value)
@@ -24,8 +22,12 @@ class ValidateTrelloSettings
 
     static private function areInvalidSettings(array $values)
     {
-        return array_filter($values, function ($value) {
-            return self::isInvalidSetting($value);
-        });
+        foreach ($values as $value) {
+            if (self::isInvalidSetting($value)) {
+                return true;
+            }
+        };
+
+        return false;
     }
 }
