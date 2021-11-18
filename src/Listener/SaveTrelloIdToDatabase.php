@@ -3,7 +3,7 @@
 namespace Blomstra\Trello\Listener;
 
 use Blomstra\Trello\ValidateTrelloSettings;
-use Exception;
+use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Saving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
@@ -26,34 +26,36 @@ class SaveTrelloIdToDatabase
         $attributes = Arr::get($event->data, 'attributes', []);
 
         if (array_key_exists('trello', $attributes)) {
-            $event->actor->assertCan('addToTrello', $event->discussion);
+            $discussion = $event->discussion;
+            $event->actor->assertCan('addToTrello', $discussion);
 
-            if (!ValidateTrelloSettings::Settings($this->settings)) {
-                return;
-            }
+            $card = $this->createTrelloCard($discussion, $attributes['trello']['lane']);
 
-            try {
-                $apiKey = $this->settings->get('blomstra-trello.api_key');
-                $apiToken = $this->settings->get('blomstra-trello.api_token');
-    
-                $client = new Client($apiKey);
-    
-                $client->setAccessToken($apiToken);
-    
-                $originalPost = $event->discussion->posts->first();
-    
-                $card = new Card($client);
-                $card->name = $event->discussion->title;
-                $card->desc = $originalPost->content;
-                $card->idList = $attributes['trello']['lane'];
-                $card = $card->save();
-    
-                $event->discussion->trello_card_id = $card->shortLink;
-                //$discussion->save();
-            } catch (Exception $e) {
-                $this->logger->error($e->getTraceAsString());
-                throw new Exception("Failed to communicate with Trello.");
+            if ($card) {
+                $discussion->trello_card_id = $card->shortLink;
             }
         }
+    }
+
+    private function createTrelloCard(Discussion $discussion, string $trelloLane): ?Card
+    {
+        if (!ValidateTrelloSettings::Settings($this->settings)) {
+            return null;
+        }
+        
+        $apiKey = $this->settings->get('blomstra-trello.api_key');
+        $apiToken = $this->settings->get('blomstra-trello.api_token');
+
+        $client = new Client($apiKey);
+
+        $client->setAccessToken($apiToken);
+
+        $originalPost = $discussion->posts->first();
+
+        $card = new Card($client);
+        $card->name = $discussion->title;
+        $card->desc = $originalPost->content;
+        $card->idList = $trelloLane;
+        return $card->save();
     }
 }
