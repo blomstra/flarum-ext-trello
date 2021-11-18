@@ -1,6 +1,6 @@
 import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
-import Model from 'flarum/Model';
+import Model from 'flarum/common/Model';
 import Discussion from 'flarum/common/models/Discussion';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import SendToTrelloModal from '../components/SendToTrelloModal';
