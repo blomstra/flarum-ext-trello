@@ -170,6 +170,8 @@ export default class SendToTrelloModal extends Modal {
     const selected = this.selected;
     const discussion = this.attrs.discussion;
 
+    this.loading = true;
+
     discussion.save({
       trello: selected
     }).then(() => {
@@ -178,9 +180,11 @@ export default class SendToTrelloModal extends Modal {
       }
   
       m.redraw();
-    })
 
-    this.hide();
+      this.loading = false;
+
+      this.hide();
+    })
   }
 
   className() {
