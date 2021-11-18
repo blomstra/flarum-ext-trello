@@ -11,6 +11,7 @@
 
 namespace Blomstra\Trello\Controllers;
 
+use Blomstra\Trello\ValidateTrelloSettings;
 use Exception;
 use Trello\Client;
 use Trello\Model\Card;
@@ -43,6 +44,10 @@ class UpdateDiscussionController extends AbstractShowController
         // TODO: do this to other controllers used in forum
         RequestUtil::getActor($request)->assertCan('addToTrello', $discussion);
 
+        if (!ValidateTrelloSettings::Settings($this->settings)) {
+            return [];
+        }
+
         try {
             $apiKey = $this->settings->get('blomstra-trello.api_key');
             $apiToken = $this->settings->get('blomstra-trello.api_token');
@@ -62,6 +67,8 @@ class UpdateDiscussionController extends AbstractShowController
             $discussion->trello_card_id = $card->shortLink;
             $discussion->save();
         } catch (Exception $e) {
+            $this->logger->error($e->getTraceAsString());
+            throw new Exception("Failed to communicate with Trello.");
         }
 
         return $discussion;

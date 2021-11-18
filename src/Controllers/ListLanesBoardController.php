@@ -21,6 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Api\Controller\AbstractListController;
 use Blomstra\Trello\Serializer\TrelloLaneSerializer;
+use Blomstra\Trello\ValidateTrelloSettings;
 
 class ListLanesBoardController extends AbstractListController
 {
@@ -42,6 +43,10 @@ class ListLanesBoardController extends AbstractListController
     protected function data(ServerRequestInterface $request, Document $document)
     {
         RequestUtil::getActor($request)->assertAdmin();
+
+        if (!ValidateTrelloSettings::Settings($this->settings)) {
+            return [];
+        }
 
         try {
             $board = Arr::get($request->getQueryParams(), 'board');

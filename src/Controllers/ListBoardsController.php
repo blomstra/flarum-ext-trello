@@ -20,6 +20,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Api\Controller\AbstractShowController;
 use Blomstra\Trello\Serializer\TrelloBoardSerializer;
+use Blomstra\Trello\ValidateTrelloSettings;
+use Psr\Log\LoggerInterface;
 
 class ListBoardsController extends AbstractShowController
 {
@@ -28,20 +30,30 @@ class ListBoardsController extends AbstractShowController
      */
     protected $settings;
 
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
 
     /**
      * {@inheritdoc}
      */
     public $serializer = TrelloBoardSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    public function __construct(SettingsRepositoryInterface $settings, LoggerInterface $logger)
     {
         $this->settings = $settings;
+        $this->logger = $logger;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
     {
         RequestUtil::getActor($request)->assertAdmin();
+
+        if (!ValidateTrelloSettings::Settings($this->settings)) {
+            return [];
+        }
 
         $selection = [];
 
@@ -73,8 +85,9 @@ class ListBoardsController extends AbstractShowController
                 $selection['Guest Workspace'][] = $data;
             }
         } catch (Exception $e) {
+            $this->logger->error($e->getTraceAsString());
+            throw new Exception("Failed to communicate with Trello.");
         }
-
 
         return $selection;
     }
