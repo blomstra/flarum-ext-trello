@@ -27,7 +27,7 @@ export default function () {
           {app.translator.trans('blomstra-trello.forum.controls.view_on_trello_button')}
         </LinkButton>
       ) : (
-        <Button icon="fab fa-trello" className="Button" onclick={() => app.modal.show(SendToTrelloModal, { discussion })}>
+        <Button icon="fab fa-trello" class="Button" onclick={() => app.modal.show(SendToTrelloModal, { discussion })}>
           {app.translator.trans('blomstra-trello.forum.controls.send_to_trello_button')}
         </Button>
       )
