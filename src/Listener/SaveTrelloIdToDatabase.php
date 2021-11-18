@@ -14,6 +14,7 @@ namespace Blomstra\Trello\Listener;
 use Blomstra\Trello\ValidateTrelloSettings;
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Saving;
+use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Trello\Client;
@@ -26,9 +27,12 @@ class SaveTrelloIdToDatabase
      */
     protected $settings;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    protected $url;
+
+    public function __construct(SettingsRepositoryInterface $settings, UrlGenerator $url)
     {
         $this->settings = $settings;
+        $this->url = $url;
     }
     
     public function handle(Saving $event) {
@@ -59,12 +63,18 @@ class SaveTrelloIdToDatabase
 
         $client->setAccessToken($apiToken);
 
-        $originalPost = $discussion->posts->first();
 
         $card = new Card($client);
         $card->name = $discussion->title;
-        $card->desc = $originalPost->content;
+        $card->desc = $this->prefixContentWithUrl($discussion);
         $card->idList = $trelloLane;
         return $card->save();
+    }
+
+    private function prefixContentWithUrl(Discussion $discussion): string
+    {
+        $url = $this->url->to('forum')->route('discussion', ['id' => $discussion->id]);
+
+        return "[Original post]($url)\n\n" . $discussion->posts->first()->content;
     }
 }
