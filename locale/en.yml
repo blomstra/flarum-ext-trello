@@ -14,6 +14,8 @@ blomstra-trello:
       api_token_help: Enter the API token in order for this extension to connect with Trello.
       api_token_label: API Token
       available_boards_label: Available boards
+      default_board_help: The selected default board will be the one that will be pre-selected in the Send to Trello modal in the forum.
+      default_board_label: Default board
       member_id_help: Enter the Trello Member ID to be used for fetching organization boards with Trello. (https://trello.com/your-trello-handle)
       member_id_label: Member ID
       no_available_boards_label: No available boards

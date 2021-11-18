@@ -11,6 +11,7 @@
 
 namespace Blomstra\Trello\Controllers;
 
+use Exception;
 use Trello\Client;
 use Trello\Model\Card;
 use Flarum\Http\RequestUtil;
@@ -35,29 +36,33 @@ class UpdateDiscussionController extends AbstractShowController
 
     protected function data(ServerRequestInterface $request, Document $document)
     {
-        RequestUtil::getActor($request)->assertAdmin();
-
-        $apiKey = $this->settings->get('blomstra-trello.api_key');
-        $apiToken = $this->settings->get('blomstra-trello.api_token');
-
-        $client = new Client($apiKey);
-
-        $client->setAccessToken($apiToken);
-
         $body = json_decode($request->getBody()->getContents());
 
         $discussion = Discussion::find($body->discussion);
 
-        $originalPost = $discussion->posts->first();
+        // TODO: do this to other controllers used in forum
+        RequestUtil::getActor($request)->assertCan('addToTrello', $discussion);
 
-        $card = new Card($client);
-        $card->name = $discussion->title;
-        $card->desc = $originalPost->content;
-        $card->idList = $body->selected->lane;
-        $card = $card->save();
+        try {
+            $apiKey = $this->settings->get('blomstra-trello.api_key');
+            $apiToken = $this->settings->get('blomstra-trello.api_token');
 
-        $discussion->trello_card_id = $card->shortLink;
-        $discussion->save();
+            $client = new Client($apiKey);
+
+            $client->setAccessToken($apiToken);
+
+            $originalPost = $discussion->posts->first();
+
+            $card = new Card($client);
+            $card->name = $discussion->title;
+            $card->desc = $originalPost->content;
+            $card->idList = $body->selected->lane;
+            $card = $card->save();
+
+            $discussion->trello_card_id = $card->shortLink;
+            $discussion->save();
+        } catch (Exception $e) {
+        }
 
         return $discussion;
     }

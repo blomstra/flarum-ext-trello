@@ -37,12 +37,8 @@ export default class TrelloSettingsPage extends ExtensionPage {
   }
 
   async loadDatabaseData() {
-    this.states.databaseBoards = (
-      await app.request({
-        method: 'GET',
-        url: app.forum.attribute('apiUrl') + '/blomstra/trello/boards',
-      })
-    ).data;
+    this.states.databaseBoards = app.forum.attribute('trelloBoards');
+
     m.redraw();
   }
 
@@ -55,7 +51,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
     ).data.attributes;
     m.redraw();
 
-    if (this.states.allBoards) {
+    if (this.states.allBoards.length) {
       const firstItem = this.states.allBoards[0];
       this.currentSelected = {
         shortLink: firstItem.boards[0].short_link,
@@ -83,7 +79,10 @@ export default class TrelloSettingsPage extends ExtensionPage {
             const data = response.data;
 
             if (data.attributes.name) {
-              this.states.databaseBoards.push(data);
+              this.states.databaseBoards.push({
+                name: data.attributes.name,
+                short_link: data.attributes.shortLink,
+              });
             }
 
             m.redraw();
@@ -96,12 +95,13 @@ export default class TrelloSettingsPage extends ExtensionPage {
 
   async removeBoardFromDefault(e: MouseEvent) {
     const shortLink = e.currentTarget.getAttribute('data-id');
+
     const response = await app.request({
       method: 'DELETE',
       url: app.forum.attribute('apiUrl') + '/blomstra/trello/boards/' + shortLink,
     });
 
-    this.states.databaseBoards = this.states.databaseBoards.filter((value) => value.attributes.shortLink != shortLink);
+    this.states.databaseBoards = this.states.databaseBoards.filter((value) => value.short_link != shortLink);
 
     this.loading = false;
     m.redraw();
@@ -109,7 +109,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
 
   content() {
     return [
-      <div class="container">
+      <div class="container BlomstraTrello">
         <div class="Form">
           <div class="Form-group">
             <h3>{app.translator.trans('blomstra-trello.admin.settings.label.general')}</h3>
@@ -136,7 +136,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.admin.settings.available_boards_label')}</label>
             {this.states.allBoards ? (
-              <div class="TagSettings-rangeInput">
+              <div class="TrelloSettings-availableBoards">
                 <span class="Select">
                   <select
                     class="Select-input FormControl"
@@ -170,29 +170,37 @@ export default class TrelloSettingsPage extends ExtensionPage {
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.admin.settings.selected_boards_label')}</label>
             {this.states.databaseBoards ? (
-              <div class="TagSettings-rangeInput">
-                <ul>
-                  {this.states.databaseBoards.map((databaseBoard) => {
-                    return [
-                      <li>
-                        <Button
-                          className="Button Button--icon"
-                          data-id={databaseBoard.attributes.shortLink}
-                          onclick={this.removeBoardFromDefault.bind(this)}
-                          icon="fas fa-minus"
-                        ></Button>{' '}
-                        {databaseBoard.attributes.name}
-                      </li>,
-                    ];
-                  })}
-                </ul>
-              </div>
+              <ul>
+                {this.states.databaseBoards.map((databaseBoard) => {
+                  return [
+                    <li>
+                      <Button
+                        className="Button Button--icon"
+                        data-id={databaseBoard.short_link}
+                        onclick={this.removeBoardFromDefault.bind(this)}
+                        icon="fas fa-minus"
+                      ></Button>{' '}
+                      {databaseBoard.name}
+                    </li>,
+                  ];
+                })}
+              </ul>
             ) : (
               <p>{app.translator.trans('blomstra-trello.admin.settings.no_selected_boards_label')}</p>
             )}
           </div>
+          {this.buildSettingComponent({
+            type: 'select',
+            setting: 'blomstra-trello.default_board_id',
+            label: app.translator.trans('blomstra-trello.admin.settings.default_board_label'),
+            help: app.translator.trans('blomstra-trello.admin.settings.default_board_help'),
+            options: this.states.databaseBoards.reduce((acc, curr) => {
+              acc[curr.short_link] = curr.name;
+              return acc;
+            }, {}),
+          })}
+          <div class="Form-group">{this.submitButton()}</div>
         </div>
-        <div class="Form-group">{this.submitButton()}</div>
       </div>,
     ];
   }

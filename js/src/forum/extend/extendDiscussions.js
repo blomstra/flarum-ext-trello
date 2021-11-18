@@ -13,7 +13,10 @@ export default function () {
 
   extend(DiscussionPage.prototype, 'sidebarItems', function (items) {
     const discussion = this.discussion;
-    if (!discussion.canAddToTrello()) return;
+
+    if (!discussion.canAddToTrello() || app.forum.attribute('trelloBoards').length == 0) {
+      return;
+    }
 
     const trelloId = discussion.trelloCardId();
     const faIcon = 'fab fa-trello';
