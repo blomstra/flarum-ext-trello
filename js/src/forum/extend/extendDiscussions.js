@@ -30,7 +30,7 @@ export default function () {
         <Button icon="fab fa-trello" class="Button" onclick={() => app.modal.show(SendToTrelloModal, { discussion })}>
           {app.translator.trans('blomstra-trello.forum.controls.send_to_trello_button')}
         </Button>
-      )
+      ), 75
     );
   });
 }
