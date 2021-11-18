@@ -6,6 +6,7 @@ import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import SendToTrelloModal from '../components/SendToTrelloModal';
 import Button from 'flarum/common/components/Button';
 import LinkButton from 'flarum/common/components/LinkButton';
+import Badge from 'flarum/common/components/Badge';
 
 export default function () {
   Discussion.prototype.trelloCardId = Model.attribute('trelloCardId');
@@ -32,5 +33,20 @@ export default function () {
         </Button>
       ), 75
     );
+  });
+
+  extend(Discussion.prototype, 'badges', function (badges) {
+    const discussion = this;
+    if (discussion.canAddToTrello() && discussion.trelloCardId()?.length) {
+      badges.add(
+        'trello',
+        Badge.component({
+          type: 'trello',
+          label: app.translator.trans('blomstra-trello.forum.badges.trello.tooltip'),
+          icon: 'fab fa-trello',
+        }),
+        10
+      );
+    }
   });
 }

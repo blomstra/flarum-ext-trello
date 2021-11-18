@@ -23,6 +23,9 @@ blomstra-trello:
       selected_boards_label: Selected boards
 
   forum:
+    badges:
+      trello:
+        tooltip: Exists in Trello
     controls:
       send_to_trello_button: Send to Trello
       view_on_trello_button: View Trello card
