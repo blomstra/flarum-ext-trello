@@ -31,6 +31,16 @@ class UpdateDiscussionController extends AbstractShowController
      */
     public $serializer = DiscussionSerializer::class;
 
+    /**
+     * @var SettingsRepositoryInterface
+     */
+    protected $settings;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
     public function __construct(SettingsRepositoryInterface $settings, LoggerInterface $logger)
     {
         $this->settings = $settings;
