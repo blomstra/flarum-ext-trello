@@ -40,11 +40,7 @@ export default function () {
     if (discussion.canAddToTrello() && discussion.trelloCardId()?.length) {
       badges.add(
         'trello',
-        Badge.component({
-          type: 'trello',
-          label: app.translator.trans('blomstra-trello.forum.badges.trello.tooltip'),
-          icon: 'fab fa-trello',
-        }),
+        <Badge type="trello" icon="fab fa-trello">{app.translator.trans('blomstra-trello.forum.badges.trello.tooltip')}</Badge>,
         10
       );
     }
