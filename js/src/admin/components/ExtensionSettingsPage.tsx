@@ -1,4 +1,5 @@
 import app from 'flarum/admin/app';
+import icon from 'flarum/common/helpers/icon';
 import Button from 'flarum/common/components/Button';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 
@@ -19,7 +20,6 @@ interface IState {
 }
 
 export default class TrelloSettingsPage extends ExtensionPage {
-
   states: IState = {
     loading: false,
     databaseBoards: null,
@@ -37,73 +37,76 @@ export default class TrelloSettingsPage extends ExtensionPage {
   }
 
   async loadDatabaseData() {
-    this.states.databaseBoards = (await app.request({
-      method: 'GET',
-      url: app.forum.attribute('apiUrl') + '/blomstra/trello/boards'
-    })).data;
+    this.states.databaseBoards = (
+      await app.request({
+        method: 'GET',
+        url: app.forum.attribute('apiUrl') + '/blomstra/trello/boards',
+      })
+    ).data;
     m.redraw();
   }
 
   async loadTrelloData() {
-    this.states.allBoards = (await app.request({
-      method: 'GET',
-      url: app.forum.attribute('apiUrl') + '/blomstra/trello/api-boards'
-    })).data.attributes;
+    this.states.allBoards = (
+      await app.request({
+        method: 'GET',
+        url: app.forum.attribute('apiUrl') + '/blomstra/trello/api-boards',
+      })
+    ).data.attributes;
     m.redraw();
 
-    if(this.states.allBoards?.length) {
-      const firstItem = this.states.allBoards[0]
+    if (this.states.allBoards) {
+      const firstItem = this.states.allBoards[0];
       this.currentSelected = {
         shortLink: firstItem.boards[0].short_link,
         text: firstItem.boards[0].name,
-      }
+      };
     }
   }
 
   addBoardToDefault() {
-    const selected = this.currentSelected
+    const selected = this.currentSelected;
 
     if (selected) {
       this.loading = true;
 
-      app.request({
-        method: 'POST',
-        url: app.forum.attribute('apiUrl') + '/blomstra/trello/boards',
-        body: {
-          selected,
-        },
-      }).then(function (response) {
-        const data = response.data;
+      app
+        .request({
+          method: 'POST',
+          url: app.forum.attribute('apiUrl') + '/blomstra/trello/boards',
+          body: {
+            selected,
+          },
+        })
+        .then(
+          function (response) {
+            const data = response.data;
 
-        if (data.attributes.name) {
-          this.states.databaseBoards.push(data);
-        }
+            if (data.attributes.name) {
+              this.states.databaseBoards.push(data);
+            }
 
-        m.redraw();
+            m.redraw();
 
-        this.loading = false;
-      }.bind(this));
-
+            this.loading = false;
+          }.bind(this)
+        );
     }
   }
 
-  removeBoardFromDefault(e) {
-    const shortLink = e.currentTarget.getAttribute('data-id')
-
-    app.request({
+  async removeBoardFromDefault(e: MouseEvent) {
+    const shortLink = e.currentTarget.getAttribute('data-id');
+    const response = await app.request({
       method: 'DELETE',
       url: app.forum.attribute('apiUrl') + '/blomstra/trello/boards/' + shortLink,
-    }).then(function (response) {
+    });
 
-      this.states.databaseBoards = this.states.databaseBoards.filter(function(value) {
-        return value.attributes.shortLink != shortLink;
-      });
+    this.states.databaseBoards = this.states.databaseBoards.filter((value) => value.attributes.shortLink != shortLink);
 
-      m.redraw();
-
-      this.loading = false;
-    }.bind(this));
+    this.loading = false;
+    m.redraw();
   }
+
   content() {
     return [
       <div class="container">
@@ -132,58 +135,64 @@ export default class TrelloSettingsPage extends ExtensionPage {
           <hr />
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.admin.settings.available_boards_label')}</label>
-            {(this.states.allBoards?.length || 0) > 0 ? (
-              <div class='TagSettings-rangeInput'>
+            {this.states.allBoards ? (
+              <div class="TagSettings-rangeInput">
                 <span class="Select">
-                  <select class="Select-input FormControl" onchange={(e) => {
-                    this.currentSelected = {
-                      shortLink: e.currentTarget.value,
-                      text: e.currentTarget.selectedOptions[0].textContent,
-                    }
-                  }}>
-                  {this.states.allBoards.map(orgData => {
-                    return [
-                      <optgroup label={`${orgData.organization}`}>{
-                        orgData.boards.map(board => (
-                          <option value={`${board.short_link}`}>{board.name}</option>))
-                      }
-                      </optgroup>
-                    ]
-                  })}
+                  <select
+                    class="Select-input FormControl"
+                    onchange={(e) => {
+                      this.currentSelected = {
+                        shortLink: e.currentTarget.value,
+                        text: e.currentTarget.selectedOptions[0].textContent,
+                      };
+                    }}
+                  >
+                    {this.states.allBoards.map((orgData) => {
+                      return (
+                        <optgroup label={`${orgData.organization}`}>
+                          {orgData.boards.map((board) => (
+                            <option value={`${board.short_link}`}>{board.name}</option>
+                          ))}
+                        </optgroup>
+                      );
+                    })}
                   </select>
-                  <i aria-hidden="true" class="icon fas fa-sort Select-caret"></i>
+                  {icon('fas fa-sort Select-caret')}
                 </span>
                 <Button className="Button Button--icon" onclick={this.addBoardToDefault.bind(this)} loading={this.loading} icon="fas fa-plus">
-                    {app.translator.trans('blomstra-trello.admin.settings.button.add')}
+                  {app.translator.trans('blomstra-trello.admin.settings.button.add')}
                 </Button>
               </div>
-              ) : (
+            ) : (
               <p>{app.translator.trans('blomstra-trello.admin.settings.no_available_boards_label')}</p>
             )}
           </div>
-          <hr />
           <div class="Form-group">
-          <label>{app.translator.trans('blomstra-trello.admin.settings.selected_boards_label')}</label>
-          {(this.states.databaseBoards?.length || 0) > 0 ? (
-              <div class='TagSettings-rangeInput'>
+            <label>{app.translator.trans('blomstra-trello.admin.settings.selected_boards_label')}</label>
+            {this.states.databaseBoards ? (
+              <div class="TagSettings-rangeInput">
                 <ul>
-                  {this.states.databaseBoards.map(databaseBoard => {
+                  {this.states.databaseBoards.map((databaseBoard) => {
                     return [
                       <li>
-                        <Button className="Button Button--icon" data-id={databaseBoard.attributes.shortLink} onclick={this.removeBoardFromDefault.bind(this)} icon="fas fa-minus"></Button>{" "}{databaseBoard.attributes.name}
-                      </li>
-                    ]
+                        <Button
+                          className="Button Button--icon"
+                          data-id={databaseBoard.attributes.shortLink}
+                          onclick={this.removeBoardFromDefault.bind(this)}
+                          icon="fas fa-minus"
+                        ></Button>{' '}
+                        {databaseBoard.attributes.name}
+                      </li>,
+                    ];
                   })}
                 </ul>
               </div>
-              ) : (
+            ) : (
               <p>{app.translator.trans('blomstra-trello.admin.settings.no_selected_boards_label')}</p>
             )}
           </div>
         </div>
-        <div class="Form-group">
-          {this.submitButton()}
-        </div>
+        <div class="Form-group">{this.submitButton()}</div>
       </div>,
     ];
   }
