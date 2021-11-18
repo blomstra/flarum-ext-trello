@@ -2,6 +2,7 @@ import app from 'flarum/admin/app';
 import icon from 'flarum/common/helpers/icon';
 import Button from 'flarum/common/components/Button';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
+import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 
 export interface Board {
   organization(): string;
@@ -38,8 +39,6 @@ export default class TrelloSettingsPage extends ExtensionPage {
 
   async loadDatabaseData() {
     this.states.databaseBoards = app.forum.attribute('trelloBoards');
-
-    m.redraw();
   }
 
   async loadTrelloData() {
@@ -49,7 +48,6 @@ export default class TrelloSettingsPage extends ExtensionPage {
         url: app.forum.attribute('apiUrl') + '/blomstra/trello/api-boards',
       })
     ).data.attributes;
-    m.redraw();
 
     if (this.states.allBoards.length) {
       const firstItem = this.states.allBoards[0];
@@ -58,6 +56,8 @@ export default class TrelloSettingsPage extends ExtensionPage {
         text: firstItem.boards[0].name,
       };
     }
+
+    m.redraw();
   }
 
   addBoardToDefault() {
@@ -135,7 +135,10 @@ export default class TrelloSettingsPage extends ExtensionPage {
           <hr />
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.admin.settings.available_boards_label')}</label>
-            {this.states.allBoards ? (
+
+            {this.states.allBoards === null ? (
+              <LoadingIndicator />
+            ) : this.states.allBoards ? (
               <div class="TrelloSettings-availableBoards">
                 <span class="Select">
                   <select
@@ -169,7 +172,9 @@ export default class TrelloSettingsPage extends ExtensionPage {
           </div>
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.admin.settings.selected_boards_label')}</label>
-            {this.states.databaseBoards ? (
+            {this.states.databaseBoards === null ? (
+              <LoadingIndicator />
+            ) : this.states.databaseBoards ? (
               <ul>
                 {this.states.databaseBoards.map((databaseBoard) => {
                   return [
@@ -189,16 +194,20 @@ export default class TrelloSettingsPage extends ExtensionPage {
               <p>{app.translator.trans('blomstra-trello.admin.settings.no_selected_boards_label')}</p>
             )}
           </div>
-          {this.buildSettingComponent({
-            type: 'select',
-            setting: 'blomstra-trello.default_board_id',
-            label: app.translator.trans('blomstra-trello.admin.settings.default_board_label'),
-            help: app.translator.trans('blomstra-trello.admin.settings.default_board_help'),
-            options: this.states.databaseBoards.reduce((acc, curr) => {
-              acc[curr.short_link] = curr.name;
-              return acc;
-            }, {}),
-          })}
+          {this.states.databaseBoards === null ? (
+            <LoadingIndicator />
+          ) : (
+            this.buildSettingComponent({
+              type: 'select',
+              setting: 'blomstra-trello.default_board_id',
+              label: app.translator.trans('blomstra-trello.admin.settings.default_board_label'),
+              help: app.translator.trans('blomstra-trello.admin.settings.default_board_help'),
+              options: this.states.databaseBoards.reduce((acc, curr) => {
+                acc[curr.short_link] = curr.name;
+                return acc;
+              }, {}),
+            })
+          )}
           <div class="Form-group">{this.submitButton()}</div>
         </div>
       </div>,
