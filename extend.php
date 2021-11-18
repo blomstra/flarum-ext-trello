@@ -20,6 +20,7 @@ use Blomstra\Trello\Controllers\ListBoardsController;
 use Blomstra\Trello\Controllers\DeleteBoardController;
 use Blomstra\Trello\Controllers\ListLanesBoardController;
 use Blomstra\Trello\Controllers\UpdateDiscussionController;
+use Flarum\Discussion\Event\Saving;
 
 return [
     (new Extend\Frontend('forum'))
@@ -36,8 +37,7 @@ return [
         ->get('/blomstra/trello/api-boards', 'blomstra::trello.boards-api.index', ListBoardsController::class)
         ->get('/blomstra/trello/api-boards/{board}/lanes', 'blomstra::trello.boards-api.lanes.index', ListLanesBoardController::class)
         ->post('/blomstra/trello/boards', 'blomstra::trello.boards.store', AddBoardController::class)
-        ->delete('/blomstra/trello/boards/{shortLink}', 'blomstra::trello.boards.destroy', DeleteBoardController::class)
-        ->patch('/blomstra/trello/discussions', 'blomstra::trello.discussions.update', UpdateDiscussionController::class),
+        ->delete('/blomstra/trello/boards/{shortLink}', 'blomstra::trello.boards.destroy', DeleteBoardController::class),
 
     (new Extend\ApiSerializer(DiscussionSerializer::class))
         ->attribute('trelloCardId', function (DiscussionSerializer $serializer, Discussion $discussion, array $attributes) {
@@ -52,4 +52,7 @@ return [
 
     (new Extend\Settings())
         ->serializeToForum('trelloDefaultBoardId', 'blomstra-trello.default_board_id', 'strval'),
+
+    (new Extend\Event())
+        ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class)
 ];

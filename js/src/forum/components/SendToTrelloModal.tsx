@@ -164,28 +164,23 @@ export default class SendToTrelloModal extends Modal {
     m.redraw();
   }
 
-  async onsubmit(e) {
+  onsubmit(e) {
     e.preventDefault();
 
     const selected = this.selected;
-    const discussion = this.attrs.discussion.data;
+    const discussion = this.attrs.discussion;
 
-    await app.request({
-      method: 'PATCH',
-      url: app.forum.attribute('apiUrl') + '/blomstra/trello/discussions',
-      body: {
-        selected,
-        discussion: discussion.id,
-      },
-    });
+    discussion.save({
+      trello: selected
+    }).then(() => {
+      if (app.current instanceof DiscussionPage) {
+        app.current.stream.update();
+      }
+  
+      m.redraw();
+    })
 
-    if (app.current instanceof DiscussionPage) {
-      app.current.stream.update();
-    }
-
-    m.redraw();
-
-    return this.hide();
+    this.hide();
   }
 
   className() {
