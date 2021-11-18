@@ -12,7 +12,8 @@
         "forum": "https://blomstra.community/t/extensions"
     },
     "require": {
-        "flarum/core": "^1.0.0"
+        "flarum/core": "^1.0.0",
+        "sanovskiy/trello-php7": "^0.2.0"
     },
     "authors": [
         {
