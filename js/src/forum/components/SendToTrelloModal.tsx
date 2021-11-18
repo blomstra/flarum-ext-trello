@@ -33,19 +33,20 @@ export default class SendToTrelloModal extends Modal {
   content() {
     return (
       <div class="Modal-body">
-        <form class="Form">
+        <div class="Form">
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.forum.modals.fields.board')}</label>
             {this.states.boards ? (
               <span class="Select">
                 <select
                   class="Select-input FormControl"
-                  onchange={(e) =>
+                  onchange={(e: InputEvent) => {
+                    const target = e.currentTarget as HTMLSelectElement;
                     this.loadTrelloLanes({
-                      short_link: e.currentTarget.value,
-                      text: e.currentTarget.selectedOptions[0].textContent,
-                    })
-                  }
+                      short_link: target.value,
+                      text: target.selectedOptions[0].textContent,
+                    });
+                  }}
                 >
                   {this.states.boards.map((item) => {
                     return this.defaultBoardId == item.short_link ? (
@@ -90,7 +91,7 @@ export default class SendToTrelloModal extends Modal {
               {app.translator.trans('blomstra-trello.forum.controls.send_to_trello_button')}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     );
   }
