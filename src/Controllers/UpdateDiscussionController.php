@@ -22,6 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Flarum\Api\Serializer\DiscussionSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Api\Controller\AbstractShowController;
+use Psr\Log\LoggerInterface;
 
 class UpdateDiscussionController extends AbstractShowController
 {
@@ -30,9 +31,10 @@ class UpdateDiscussionController extends AbstractShowController
      */
     public $serializer = DiscussionSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    public function __construct(SettingsRepositoryInterface $settings, LoggerInterface $logger)
     {
         $this->settings = $settings;
+        $this->logger = $logger;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
