@@ -9,7 +9,7 @@
     "support": {
         "issues": "https://github.com/blomstra/flarum-ext-trello/issues",
         "source": "https://github.com/blomstra/flarum-ext-trello",
-        "forum": "https://blomstra.community/t/extensions"
+        "forum": "https://blomstra.community/t/trello"
     },
     "require": {
         "flarum/core": "^1.0.0",

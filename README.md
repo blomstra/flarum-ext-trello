@@ -20,8 +20,12 @@ php flarum migrate
 php flarum cache:clear
 ```
 
+## Sponsor
+
+This extension was sponsored by [Kagi Search](https://kagi.com/), an ad free search engine
+
 ## Links
 
 - [Packagist](https://packagist.org/packages/blomstra/trello)
-- [GitHub](https://github.com/blomstra/trello)
-- [Discuss](https://discuss.flarum.org/d/PUT_DISCUSS_SLUG_HERE)
+- [GitHub](https://github.com/blomstra/flarum-ext-trello)
+- [Discuss](https://blomstra.community/t/trello)
