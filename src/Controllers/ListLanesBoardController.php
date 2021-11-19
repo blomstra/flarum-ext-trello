@@ -11,17 +11,17 @@
 
 namespace Blomstra\Trello\Controllers;
 
-use Exception;
-use Trello\Client;
-use Trello\Model\Board;
-use Illuminate\Support\Arr;
-use Flarum\Http\RequestUtil;
-use Tobscure\JsonApi\Document;
-use Psr\Http\Message\ServerRequestInterface;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\Api\Controller\AbstractListController;
 use Blomstra\Trello\Serializer\TrelloLaneSerializer;
 use Blomstra\Trello\ValidateTrelloSettings;
+use Exception;
+use Flarum\Api\Controller\AbstractListController;
+use Flarum\Http\RequestUtil;
+use Flarum\Settings\SettingsRepositoryInterface;
+use Illuminate\Support\Arr;
+use Psr\Http\Message\ServerRequestInterface;
+use Tobscure\JsonApi\Document;
+use Trello\Client;
+use Trello\Model\Board;
 
 class ListLanesBoardController extends AbstractListController
 {

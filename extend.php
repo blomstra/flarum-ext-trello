@@ -11,16 +11,15 @@
 
 namespace Blomstra\Trello;
 
-use Flarum\Extend;
-use Flarum\Discussion\Discussion;
-use Flarum\Api\Serializer\ForumSerializer;
-use Flarum\Api\Serializer\DiscussionSerializer;
 use Blomstra\Trello\Controllers\AddBoardController;
-use Blomstra\Trello\Controllers\ListBoardsController;
 use Blomstra\Trello\Controllers\DeleteBoardController;
+use Blomstra\Trello\Controllers\ListBoardsController;
 use Blomstra\Trello\Controllers\ListLanesBoardController;
-use Blomstra\Trello\Controllers\UpdateDiscussionController;
+use Flarum\Api\Serializer\DiscussionSerializer;
+use Flarum\Api\Serializer\ForumSerializer;
+use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Saving;
+use Flarum\Extend;
 
 return [
     (new Extend\Frontend('forum'))
@@ -54,5 +53,5 @@ return [
         ->serializeToForum('trelloDefaultBoardId', 'blomstra-trello.default_board_id', 'strval'),
 
     (new Extend\Event())
-        ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class)
+        ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class),
 ];

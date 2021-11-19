@@ -11,13 +11,13 @@
 
 namespace Blomstra\Trello\Controllers;
 
-use Flarum\Http\RequestUtil;
-use Tobscure\JsonApi\Document;
 use Blomstra\Trello\Models\TrelloBoard;
-use Psr\Http\Message\ServerRequestInterface;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\Api\Controller\AbstractCreateController;
 use Blomstra\Trello\Serializer\DatabaseBoardSerializer;
+use Flarum\Api\Controller\AbstractCreateController;
+use Flarum\Http\RequestUtil;
+use Flarum\Settings\SettingsRepositoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Tobscure\JsonApi\Document;
 
 class AddBoardController extends AbstractCreateController
 {
@@ -43,7 +43,7 @@ class AddBoardController extends AbstractCreateController
         $body = json_decode($request->getBody()->getContents())->selected;
 
         $data = [
-            'name' => $body->text,
+            'name'       => $body->text,
             'short_link' => $body->shortLink,
         ];
 

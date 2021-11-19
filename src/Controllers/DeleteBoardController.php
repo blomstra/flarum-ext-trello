@@ -11,11 +11,11 @@
 
 namespace Blomstra\Trello\Controllers;
 
-use Illuminate\Support\Arr;
-use Flarum\Http\RequestUtil;
 use Blomstra\Trello\Models\TrelloBoard;
-use Psr\Http\Message\ServerRequestInterface;
 use Flarum\Api\Controller\AbstractDeleteController;
+use Flarum\Http\RequestUtil;
+use Illuminate\Support\Arr;
+use Psr\Http\Message\ServerRequestInterface;
 
 class DeleteBoardController extends AbstractDeleteController
 {

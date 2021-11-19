@@ -1,12 +1,21 @@
 <?php
 
+/*
+ * This file is part of blomstra/trello.
+ *
+ * Copyright (c) 2021 Blomstra Ltd.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace Blomstra\Trello;
 
 use Flarum\Settings\SettingsRepositoryInterface;
 
 class ValidateTrelloSettings
 {
-    static function Settings(SettingsRepositoryInterface $settings)
+    public static function Settings(SettingsRepositoryInterface $settings)
     {
         $apiKey = $settings->get('blomstra-trello.api_key');
         $apiToken = $settings->get('blomstra-trello.api_token');
@@ -15,18 +24,18 @@ class ValidateTrelloSettings
         return !self::areInvalidSettings([$apiKey, $apiToken, $memberId]);
     }
 
-    static private function isInvalidSetting(mixed $value)
+    private static function isInvalidSetting(mixed $value)
     {
         return $value === null || $value === '';
     }
 
-    static private function areInvalidSettings(array $values)
+    private static function areInvalidSettings(array $values)
     {
         foreach ($values as $value) {
             if (self::isInvalidSetting($value)) {
                 return true;
             }
-        };
+        }
 
         return false;
     }

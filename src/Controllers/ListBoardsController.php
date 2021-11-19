@@ -11,17 +11,17 @@
 
 namespace Blomstra\Trello\Controllers;
 
-use Exception;
-use Trello\Client;
-use Trello\Model\Member;
-use Flarum\Http\RequestUtil;
-use Tobscure\JsonApi\Document;
-use Psr\Http\Message\ServerRequestInterface;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\Api\Controller\AbstractShowController;
 use Blomstra\Trello\Serializer\TrelloBoardSerializer;
 use Blomstra\Trello\ValidateTrelloSettings;
+use Exception;
+use Flarum\Api\Controller\AbstractShowController;
+use Flarum\Http\RequestUtil;
+use Flarum\Settings\SettingsRepositoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Tobscure\JsonApi\Document;
+use Trello\Client;
+use Trello\Model\Member;
 
 class ListBoardsController extends AbstractShowController
 {
@@ -34,7 +34,6 @@ class ListBoardsController extends AbstractShowController
      * @var LoggerInterface
      */
     protected $logger;
-
 
     /**
      * {@inheritdoc}
@@ -86,7 +85,8 @@ class ListBoardsController extends AbstractShowController
             }
         } catch (Exception $e) {
             $this->logger->error($e->getTraceAsString());
-            throw new Exception("Failed to communicate with Trello.");
+
+            throw new Exception('Failed to communicate with Trello.');
         }
 
         return $selection;

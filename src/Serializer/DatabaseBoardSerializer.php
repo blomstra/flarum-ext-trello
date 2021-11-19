@@ -21,7 +21,7 @@ class DatabaseBoardSerializer extends AbstractSerializer
     protected function getDefaultAttributes($board)
     {
         $attributes = [
-            'name' => $board->name,
+            'name'      => $board->name,
             'shortLink' => $board->short_link,
         ];
 

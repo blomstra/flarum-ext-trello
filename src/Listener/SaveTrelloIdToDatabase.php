@@ -34,8 +34,9 @@ class SaveTrelloIdToDatabase
         $this->settings = $settings;
         $this->url = $url;
     }
-    
-    public function handle(Saving $event) {
+
+    public function handle(Saving $event)
+    {
         $attributes = Arr::get($event->data, 'attributes', []);
 
         if (array_key_exists('trello', $attributes)) {
@@ -55,7 +56,7 @@ class SaveTrelloIdToDatabase
         if (!ValidateTrelloSettings::Settings($this->settings)) {
             return null;
         }
-        
+
         $apiKey = $this->settings->get('blomstra-trello.api_key');
         $apiToken = $this->settings->get('blomstra-trello.api_token');
 
@@ -63,11 +64,11 @@ class SaveTrelloIdToDatabase
 
         $client->setAccessToken($apiToken);
 
-
         $card = new Card($client);
         $card->name = $discussion->title;
         $card->desc = $this->prefixContentWithUrl($discussion);
         $card->idList = $trelloLane;
+
         return $card->save();
     }
 
@@ -75,6 +76,6 @@ class SaveTrelloIdToDatabase
     {
         $url = $this->url->to('forum')->route('discussion', ['id' => $discussion->id]);
 
-        return "[Original post]($url)\n\n" . $discussion->posts->first()->content;
+        return "[Original post]($url)\n\n".$discussion->posts->first()->content;
     }
 }
