@@ -83,6 +83,10 @@ class SaveTrelloIdToDatabase
 
     private function rememberLastUsedLaneId(string $lane): void
     {
-        $this->settings->set('blomstra-trello.last_used_lane_id', $lane);
+        $currentSetting = $this->settings->get('blomstra-trello.last_used_lane_id');
+
+        if (strcmp($currentSetting, $lane) != 0) {
+            $this->settings->set('blomstra-trello.last_used_lane_id', $lane);
+        }
     }
 }
