@@ -11,9 +11,16 @@
 
 namespace Blomstra\Trello;
 
-use Flarum\Api\Serializer\DiscussionSerializer;
-use Flarum\Discussion\Discussion;
 use Flarum\Extend;
+use Flarum\Discussion\Discussion;
+use Flarum\Api\Serializer\ForumSerializer;
+use Flarum\Api\Serializer\DiscussionSerializer;
+use Blomstra\Trello\Controllers\AddBoardController;
+use Blomstra\Trello\Controllers\ListBoardsController;
+use Blomstra\Trello\Controllers\DeleteBoardController;
+use Blomstra\Trello\Controllers\ListLanesBoardController;
+use Blomstra\Trello\Controllers\UpdateDiscussionController;
+use Flarum\Discussion\Event\Saving;
 
 return [
     (new Extend\Frontend('forum'))
@@ -26,6 +33,12 @@ return [
 
     new Extend\Locales(__DIR__.'/locale'),
 
+    (new Extend\Routes('api'))
+        ->get('/blomstra/trello/api-boards', 'blomstra::trello.boards-api.index', ListBoardsController::class)
+        ->get('/blomstra/trello/api-boards/{board}/lanes', 'blomstra::trello.boards-api.lanes.index', ListLanesBoardController::class)
+        ->post('/blomstra/trello/boards', 'blomstra::trello.boards.store', AddBoardController::class)
+        ->delete('/blomstra/trello/boards/{shortLink}', 'blomstra::trello.boards.destroy', DeleteBoardController::class),
+
     (new Extend\ApiSerializer(DiscussionSerializer::class))
         ->attribute('trelloCardId', function (DiscussionSerializer $serializer, Discussion $discussion, array $attributes) {
             return $discussion->trello_card_id;
@@ -33,4 +46,13 @@ return [
         ->attribute('canAddToTrello', function (DiscussionSerializer $serializer, Discussion $discussion, array $attributes) {
             return (bool) $serializer->getActor()->can('addToTrello', $discussion);
         }),
+
+    (new Extend\ApiSerializer(ForumSerializer::class))
+        ->attributes(TrelloAttributes::class),
+
+    (new Extend\Settings())
+        ->serializeToForum('trelloDefaultBoardId', 'blomstra-trello.default_board_id', 'strval'),
+
+    (new Extend\Event())
+        ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class)
 ];
