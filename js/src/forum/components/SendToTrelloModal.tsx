@@ -172,19 +172,21 @@ export default class SendToTrelloModal extends Modal {
 
     this.loading = true;
 
-    discussion.save({
-      trello: selected
-    }).then(() => {
-      if (app.current instanceof DiscussionPage) {
-        app.current.stream.update();
-      }
-  
-      m.redraw();
+    discussion
+      .save({
+        trello: selected,
+      })
+      .then(() => {
+        if (app.current instanceof DiscussionPage) {
+          app.current.stream.update();
+        }
 
-      this.loading = false;
+        m.redraw();
 
-      this.hide();
-    })
+        this.loading = false;
+
+        this.hide();
+      });
   }
 
   className() {

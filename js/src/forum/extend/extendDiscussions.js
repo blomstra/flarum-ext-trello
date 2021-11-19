@@ -31,7 +31,8 @@ export default function () {
         <Button icon="fab fa-trello" class="Button" onclick={() => app.modal.show(SendToTrelloModal, { discussion })}>
           {app.translator.trans('blomstra-trello.forum.controls.send_to_trello_button')}
         </Button>
-      ), 75
+      ),
+      75
     );
   });
 
@@ -40,7 +41,9 @@ export default function () {
     if (discussion.canAddToTrello() && discussion.trelloCardId()?.length) {
       badges.add(
         'trello',
-        <Badge type="trello" icon="fab fa-trello">{app.translator.trans('blomstra-trello.forum.badges.trello.tooltip')}</Badge>,
+        <Badge type="trello" icon="fab fa-trello">
+          {app.translator.trans('blomstra-trello.forum.badges.trello.tooltip')}
+        </Badge>,
         10
       );
     }
