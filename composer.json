@@ -1,6 +1,6 @@
 {
     "name": "blomstra/trello",
-    "description": "Integrate Trello into Flarum",
+    "description": "Create Trello cards from Flarum discussions",
     "keywords": [
         "flarum"
     ],
@@ -11,6 +11,7 @@
         "source": "https://github.com/blomstra/flarum-ext-trello",
         "forum": "https://blomstra.community/t/trello"
     },
+    "homepage": "https://blomstra.net",
     "require": {
         "flarum/core": "^1.0.0",
         "sanovskiy/trello-php7": "^0.2.0"

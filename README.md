@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/blomstra/trello.svg)](https://packagist.org/packages/blomstra/trello) [![Total Downloads](https://img.shields.io/packagist/dt/blomstra/trello.svg)](https://packagist.org/packages/blomstra/trello)
 
-A [Flarum](http://flarum.org) extension. Integrate Trello into Flarum
+A [Flarum](http://flarum.org) extension. Create Trello cards from Flarum discussions
 
 ## Installation
 
