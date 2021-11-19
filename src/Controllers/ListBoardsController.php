@@ -19,10 +19,10 @@ use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Tobscure\JsonApi\Document;
 use Trello\Client;
 use Trello\Model\Member;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListBoardsController extends AbstractShowController
 {
