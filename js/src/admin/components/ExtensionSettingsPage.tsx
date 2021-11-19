@@ -110,8 +110,10 @@ export default class TrelloSettingsPage extends ExtensionPage {
 
   content() {
     const link = (
-      <Link href="https://trello.com/app-key" external={true} target="_blank">https://trello.com/app-key</Link>
-      );
+      <Link href="https://trello.com/app-key" external={true} target="_blank">
+        https://trello.com/app-key
+      </Link>
+    );
 
     return [
       <div class="container BlomstraTrello">
@@ -123,7 +125,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
               setting: 'blomstra-trello.api_key',
               label: app.translator.trans('blomstra-trello.admin.settings.api_key_label'),
               help: app.translator.trans('blomstra-trello.admin.settings.api_key_help', {
-                link
+                link,
               }),
             })}
             {this.buildSettingComponent({
@@ -131,7 +133,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
               setting: 'blomstra-trello.api_token',
               label: app.translator.trans('blomstra-trello.admin.settings.api_token_label'),
               help: app.translator.trans('blomstra-trello.admin.settings.api_token_help', {
-                link
+                link,
               }),
             })}
             {this.buildSettingComponent({
