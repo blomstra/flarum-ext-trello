@@ -77,7 +77,7 @@ export default class SendToTrelloModal extends Modal {
                   }
                 >
                   {this.states.lanes.map((item) => {
-                    return this.defaultLaneId == item.attributes.id ? (
+                    return this.selected.lane == item.attributes.id ? (
                       <option selected value={item.attributes.id}>
                         {item.attributes.name}
                       </option>
@@ -142,6 +142,8 @@ export default class SendToTrelloModal extends Modal {
       short_link: item.short_link,
       text: item.text,
     };
+
+    this.defaultBoardId = item.short_link;
   }
 
   setCurrentSelectedLane(item) {
@@ -164,7 +166,7 @@ export default class SendToTrelloModal extends Modal {
     const data = response.data;
     this.states.lanes = data;
     if (this.states.lanes.length) {
-      this.setCurrentSelectedLane({ id: this.states.lanes[0].id });
+      this.setCurrentSelectedLane({ id: this.defaultLaneId });
     }
     this.disabled = false;
 
