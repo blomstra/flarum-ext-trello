@@ -19,6 +19,7 @@ use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Tobscure\JsonApi\Document;
 use Trello\Client;
 use Trello\Model\Member;
@@ -36,13 +37,19 @@ class ListBoardsController extends AbstractShowController
     protected $logger;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * {@inheritdoc}
      */
     public $serializer = TrelloBoardSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings, LoggerInterface $logger)
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, LoggerInterface $logger)
     {
         $this->settings = $settings;
+        $this->translator = $translator;
         $this->logger = $logger;
     }
 
@@ -81,7 +88,7 @@ class ListBoardsController extends AbstractShowController
                     continue;
                 }
 
-                $selection['Guest Workspace'][] = $data;
+                $selection[$this->translator->trans('blomstra-trello.admin.settings.guest_workspace')][] = $data;
             }
         } catch (Exception $e) {
             $this->logger->error($e->getTraceAsString());
