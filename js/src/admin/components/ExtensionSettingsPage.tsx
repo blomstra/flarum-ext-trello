@@ -3,6 +3,7 @@ import icon from 'flarum/common/helpers/icon';
 import Button from 'flarum/common/components/Button';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import Link from 'flarum/common/components/Link';
 
 export interface Board {
   organization(): string;
@@ -108,6 +109,10 @@ export default class TrelloSettingsPage extends ExtensionPage {
   }
 
   content() {
+    const link = (
+      <Link href="https://trello.com/app-key" external={true} target="_blank">https://trello.com/app-key</Link>
+      );
+
     return [
       <div class="container BlomstraTrello">
         <div class="Form">
@@ -117,13 +122,17 @@ export default class TrelloSettingsPage extends ExtensionPage {
               type: 'string',
               setting: 'blomstra-trello.api_key',
               label: app.translator.trans('blomstra-trello.admin.settings.api_key_label'),
-              help: app.translator.trans('blomstra-trello.admin.settings.api_key_help'),
+              help: app.translator.trans('blomstra-trello.admin.settings.api_key_help', {
+                link
+              }),
             })}
             {this.buildSettingComponent({
               type: 'string',
               setting: 'blomstra-trello.api_token',
               label: app.translator.trans('blomstra-trello.admin.settings.api_token_label'),
-              help: app.translator.trans('blomstra-trello.admin.settings.api_token_help'),
+              help: app.translator.trans('blomstra-trello.admin.settings.api_token_help', {
+                link
+              }),
             })}
             {this.buildSettingComponent({
               type: 'string',

@@ -9,9 +9,9 @@ blomstra-trello:
       label:
         general: General
         boards: Boards Settings
-      api_key_help: Enter the API key in order for this extension to connect with Trello.
+      api_key_help: Enter the API key from {link} in order for this extension to connect with Trello.
       api_key_label: API Key
-      api_token_help: Enter the API token in order for this extension to connect with Trello.
+      api_token_help: Enter the API token in order for this extension to connect with Trello. Visit {link} and click <code>Generate a Token</code>
       api_token_label: API Token
       available_boards_label: Available boards
       default_board_help: The selected default board will be the one that will be pre-selected in the Send to Trello modal in the forum.
