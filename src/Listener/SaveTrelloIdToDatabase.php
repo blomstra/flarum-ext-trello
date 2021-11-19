@@ -27,11 +27,20 @@ class SaveTrelloIdToDatabase
      */
     protected $settings;
 
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var UrlGenerator
+     */
     protected $url;
 
-    public function __construct(SettingsRepositoryInterface $settings, UrlGenerator $url)
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, UrlGenerator $url)
     {
         $this->settings = $settings;
+        $this->translator = $translator;
         $this->url = $url;
     }
 
@@ -65,7 +74,7 @@ class SaveTrelloIdToDatabase
         $client->setAccessToken($apiToken);
 
         $card = new Card($client);
-        $card->name = $discussion->title;
+        $card->name = "{$discussion->title} - {$discussion->user->username}";
         $card->desc = $this->prefixContentWithUrl($discussion);
         $card->idList = $trelloLane;
 
@@ -74,8 +83,13 @@ class SaveTrelloIdToDatabase
 
     private function prefixContentWithUrl(Discussion $discussion): string
     {
-        $url = $this->url->to('forum')->route('discussion', ['id' => $discussion->id]);
+        $user = $discussion->user;
 
-        return "[Original post]($url)\n\n".$discussion->posts->first()->content;
+        $postUrl = $this->url->to('forum')->route('discussion', ['id' => $discussion->id]);
+        $posterUrl = $this->url->to('forum')->route('user', ['username' => $user->username]);
+
+        $originalPost = $this->translator->trans('blomstra-trello.forum.original_post');
+
+        return "[{$originalPost}]($postUrl) - [{$user->username}]($posterUrl)\n\n".$discussion->posts->first()->content;
     }
 }

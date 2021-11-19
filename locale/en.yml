@@ -37,3 +37,4 @@ blomstra-trello:
       no_available_boards_label: No available boards
       select_a_board_label: -- Select a board --
       title: Send to Trello
+    original_post: Original post
