@@ -50,7 +50,8 @@ return [
         ->attributes(TrelloAttributes::class),
 
     (new Extend\Settings())
-        ->serializeToForum('trelloDefaultBoardId', 'blomstra-trello.default_board_id', 'strval'),
+        ->serializeToForum('trelloDefaultBoardId', 'blomstra-trello.default_board_id', 'strval')
+        ->serializeToForum('trelloLastUsedLaneId', 'blomstra-trello.last_used_lane_id', 'strval'),
 
     (new Extend\Event())
         ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class),

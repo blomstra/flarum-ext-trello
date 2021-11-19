@@ -47,6 +47,8 @@ class SaveTrelloIdToDatabase
 
             if ($card) {
                 $discussion->trello_card_id = $card->shortLink;
+
+                $this->rememberLastUsedLaneId($attributes['trello']['lane']);
             }
         }
     }
@@ -77,5 +79,10 @@ class SaveTrelloIdToDatabase
         $url = $this->url->to('forum')->route('discussion', ['id' => $discussion->id]);
 
         return "[Original post]($url)\n\n".$discussion->posts->first()->content;
+    }
+
+    private function rememberLastUsedLaneId(string $lane): void
+    {
+        $this->settings->set('blomstra-trello.last_used_lane_id', $lane);
     }
 }

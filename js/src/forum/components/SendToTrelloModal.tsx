@@ -77,7 +77,13 @@ export default class SendToTrelloModal extends Modal {
                   }
                 >
                   {this.states.lanes.map((item) => {
-                    return [<option value={item.attributes.id}>{item.attributes.name}</option>];
+                    return this.defaultLaneId == item.attributes.id ? (
+                      <option selected value={item.attributes.id}>
+                        {item.attributes.name}
+                      </option>
+                    ) : (
+                      <option value={item.attributes.id}>{item.attributes.name}</option>
+                    );
                   })}
                 </select>
                 {icon('fas fa-sort Select-caret')}
@@ -107,6 +113,7 @@ export default class SendToTrelloModal extends Modal {
     };
 
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
+    this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
 
     this.loadData();
   }
