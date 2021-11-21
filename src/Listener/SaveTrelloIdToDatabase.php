@@ -88,7 +88,7 @@ class SaveTrelloIdToDatabase
         $postUrl = $this->url->to('forum')->route('discussion', ['id' => $discussion->id]);
         $posterUrl = $this->url->to('forum')->route('user', ['username' => $user->username]);
 
-        $originalPost = $this->translator->trans('blomstra-trello.forum.original_post');
+        $originalPost = $this->translator->trans('blomstra-trello.lib.original_post');
 
         return "[{$originalPost}]($postUrl) - [{$user->username}]($posterUrl)\n\n".$discussion->posts->first()->content;
     }
