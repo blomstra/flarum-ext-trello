@@ -16,10 +16,13 @@ use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Saving;
 use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\Tags\Tag;
 use Illuminate\Support\Arr;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Trello\Client;
-use Trello\Model\Card;
+use Trello\Models\Board;
+use Trello\Models\Card;
+use Trello\Models\Label;
 
 class SaveTrelloIdToDatabase
 {
@@ -59,29 +62,26 @@ class SaveTrelloIdToDatabase
                 $discussion->trello_card_id = $card->shortLink;
 
                 $this->rememberLastUsedLaneId($attributes['trello']['lane']);
+
+                $this->attachLabelsToCardBasedOnForumTags($discussion, $card, $attributes['trello']['board']['short_link']);
             }
         }
     }
 
     private function createTrelloCard(Discussion $discussion, string $trelloLane): ?Card
     {
-        if (!ValidateTrelloSettings::Settings($this->settings)) {
-            return null;
+        $client = $this->createTrelloApiClient();
+
+        if ($client) {
+            $card = new Card($client);
+            $card->name = $discussion->title;
+            $card->desc = $this->prefixContentWithUrl($discussion);
+            $card->idList = $trelloLane;
+
+            return $card->save();
         }
 
-        $apiKey = $this->settings->get('blomstra-trello.api_key');
-        $apiToken = $this->settings->get('blomstra-trello.api_token');
-
-        $client = new Client($apiKey);
-
-        $client->setAccessToken($apiToken);
-
-        $card = new Card($client);
-        $card->name = "{$discussion->title} - {$discussion->user->username}";
-        $card->desc = $this->prefixContentWithUrl($discussion);
-        $card->idList = $trelloLane;
-
-        return $card->save();
+        return null;
     }
 
     private function prefixContentWithUrl(Discussion $discussion): string
@@ -103,5 +103,62 @@ class SaveTrelloIdToDatabase
         if (strcmp($currentSetting, $lane) != 0) {
             $this->settings->set('blomstra-trello.last_used_lane_id', $lane);
         }
+    }
+
+    private function attachLabelsToCardBasedOnForumTags(Discussion $discussion, Card $card, string $shortLink)
+    {
+        if ($client = $this->createTrelloApiClient()) {
+            $board = (new Board($client))->setId($shortLink)->get();
+
+            if ($board) {
+                $labels = collect($board->getLabels());
+
+                $discussion->tags->each(function ($tag) use ($labels, $board, $card) {
+                    $label = $labels->filter(function ($label) use ($tag) {
+                        return $label->name == $tag->name;
+                    })->first();
+
+                    if (!$label) {
+                        $label = $labels->filter(function ($label) {
+                            return $label->name == '';
+                        })->first();
+
+                        $label = $this->updateOrCreateLabel($label, $board, $tag);
+                    }
+
+                    $card->addLabel($label);
+                });
+            }
+        }
+    }
+
+    private function updateOrCreateLabel(?Label $label, Board $board, Tag $tag)
+    {
+        if (!$label) {
+            $client = $this->createTrelloApiClient();
+
+            $label = new Label($client);
+            $label->idBoard = $board->getId();
+        }
+
+        $label->name = $tag->name;
+
+        return $label->save();
+    }
+
+    private function createTrelloApiClient(): ?Client
+    {
+        if (!ValidateTrelloSettings::Settings($this->settings)) {
+            return null;
+        }
+
+        $apiKey = $this->settings->get('blomstra-trello.api_key');
+        $apiToken = $this->settings->get('blomstra-trello.api_token');
+
+        $client = new Client($apiKey);
+
+        $client->setAccessToken($apiToken);
+
+        return $client;
     }
 }

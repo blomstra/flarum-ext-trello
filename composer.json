@@ -14,7 +14,7 @@
     "homepage": "https://blomstra.net",
     "require": {
         "flarum/core": "^1.0.0",
-        "sanovskiy/trello-php7": "^0.2.0"
+        "bkintanar/trello-php": "^0.6.0"
     },
     "authors": [
         {
