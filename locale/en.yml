@@ -9,6 +9,7 @@ blomstra-trello:
       label:
         general: General
         boards: Boards Settings
+        optional: Optional Settings
       api_key_help: Enter the API key from {link} in order for this extension to connect with Trello.
       api_key_label: API Key
       api_token_help: Enter the API token in order for this extension to connect with Trello. Visit {link} and click <code>Generate a Token</code>
@@ -22,6 +23,8 @@ blomstra-trello:
       no_available_boards_label: No available boards
       no_selected_boards_label: No selected boards
       selected_boards_label: Selected boards
+      include_secondary_tags_label: Include secondary tags
+      include_secondary_tags_help: When this option is disabled, this extension will ignore secondary tags (they will not be included in the Trello payload). When this option is enabled, all tags for the discussion will be sent to Trello.
 
   forum:
     badges:

@@ -219,6 +219,16 @@ export default class TrelloSettingsPage extends ExtensionPage {
               }, {}),
             })
           )}
+          <hr />
+          <div class="Form-group">
+            <h3>{app.translator.trans('blomstra-trello.admin.settings.label.optional')}</h3>
+            {this.buildSettingComponent({
+              type: 'boolean',
+              setting: 'blomstra-trello.include_secondary_tags_as_trello_labels',
+              label: app.translator.trans('blomstra-trello.admin.settings.include_secondary_tags_label'),
+              help: app.translator.trans('blomstra-trello.admin.settings.include_secondary_tags_help'),
+            })}
+          </div>
           <div class="Form-group">{this.submitButton()}</div>
         </div>
       </div>,
