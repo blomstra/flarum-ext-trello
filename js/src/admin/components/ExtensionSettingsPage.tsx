@@ -145,8 +145,8 @@ export default class TrelloSettingsPage extends ExtensionPage {
           </div>
           <hr />
           <div class="Form-group">
+            <h3>{app.translator.trans('blomstra-trello.admin.settings.label.boards')}</h3>
             <label>{app.translator.trans('blomstra-trello.admin.settings.available_boards_label')}</label>
-
             {this.states.allBoards === null ? (
               <LoadingIndicator />
             ) : this.states.allBoards ? (
