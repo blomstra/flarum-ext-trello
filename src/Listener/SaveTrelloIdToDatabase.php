@@ -113,7 +113,7 @@ class SaveTrelloIdToDatabase
             if ($board) {
                 $labels = collect($board->getLabels());
 
-                $includeSecondaryTags = $this->settings->get('blomstra-trello.include_secondary_tags_as_trello_labels', false);
+                $includeSecondaryTags = (bool) $this->settings->get('blomstra-trello.include_secondary_tags_as_trello_labels', false);
 
                 $discussion->tags->filter(function ($tag) use ($includeSecondaryTags) {
                     return $includeSecondaryTags ?: !is_null($tag->position);
