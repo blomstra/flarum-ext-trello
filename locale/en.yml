@@ -24,7 +24,7 @@ blomstra-trello:
       no_selected_boards_label: No selected boards
       selected_boards_label: Selected boards
       include_secondary_tags_label: Include secondary tags
-      include_secondary_tags_help: When this option is disabled, this extension will ignore secondary tags (they will not be included in the Trello payload). When this option is enabled, all tags for the discussion will be sent to Trello.
+      include_secondary_tags_help: When disabled, only primary discussion tags will be sent to Trello. When enabled, all tags will be sent to Trello.
 
   forum:
     badges:
