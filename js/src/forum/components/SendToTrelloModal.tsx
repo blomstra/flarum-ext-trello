@@ -166,7 +166,16 @@ export default class SendToTrelloModal extends Modal {
     const data = response.data;
     this.states.lanes = data;
     if (this.states.lanes.length) {
-      this.setCurrentSelectedLane({ id: this.defaultLaneId });
+
+      const laneExists = this.states.lanes?.filter(function (item) {
+        return item.id = this.defaultLaneId;
+      }.bind(this));
+
+      if (laneExists.length) {
+        this.setCurrentSelectedLane({ id: this.defaultLaneId });
+      } else {
+        this.setCurrentSelectedLane({ id: this.states.lanes[0].attributes.id})
+      }
     }
     this.disabled = false;
 
