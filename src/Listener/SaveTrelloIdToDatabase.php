@@ -17,6 +17,7 @@ use Flarum\Discussion\Event\Saving;
 use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Trello\Client;
 use Trello\Model\Card;
 
