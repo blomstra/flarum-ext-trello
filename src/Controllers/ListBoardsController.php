@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Tobscure\JsonApi\Document;
 use Trello\Client;
-use Trello\Model\Member;
+use Trello\Models\Member;
 
 class ListBoardsController extends AbstractShowController
 {

@@ -21,7 +21,7 @@ use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 use Trello\Client;
-use Trello\Model\Board;
+use Trello\Models\Board;
 
 class ListLanesBoardController extends AbstractListController
 {
