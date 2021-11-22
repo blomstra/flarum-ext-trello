@@ -56,6 +56,8 @@ class SaveTrelloIdToDatabase
 
             if ($card) {
                 $discussion->trello_card_id = $card->shortLink;
+
+                $this->rememberLastUsedLaneId($attributes['trello']['lane']);
             }
         }
     }
@@ -91,5 +93,14 @@ class SaveTrelloIdToDatabase
         $originalPost = $this->translator->trans('blomstra-trello.lib.original_post');
 
         return "[{$originalPost}]($postUrl) - [{$user->username}]($posterUrl)\n\n".$discussion->posts->first()->content;
+    }
+
+    private function rememberLastUsedLaneId(string $lane): void
+    {
+        $currentSetting = $this->settings->get('blomstra-trello.last_used_lane_id');
+
+        if (strcmp($currentSetting, $lane) != 0) {
+            $this->settings->set('blomstra-trello.last_used_lane_id', $lane);
+        }
     }
 }

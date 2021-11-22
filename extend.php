@@ -49,9 +49,6 @@ return [
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(TrelloAttributes::class),
 
-    (new Extend\Settings())
-        ->serializeToForum('trelloDefaultBoardId', 'blomstra-trello.default_board_id', 'strval'),
-
     (new Extend\Event())
         ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class),
 ];
