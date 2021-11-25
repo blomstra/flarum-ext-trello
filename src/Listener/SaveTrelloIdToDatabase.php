@@ -62,6 +62,7 @@ class SaveTrelloIdToDatabase
                 $discussion->trello_card_id = $card->shortLink;
 
                 $this->rememberLastUsedLaneId($attributes['trello']['lane']);
+                $this->rememberLastUsedBoardId($attributes['trello']['board']['short_link']);
 
                 $this->attachLabelsToCardBasedOnForumTags($discussion, $card, $attributes['trello']['board']['short_link']);
             }
@@ -102,6 +103,15 @@ class SaveTrelloIdToDatabase
 
         if (strcmp($currentSetting, $lane) != 0) {
             $this->settings->set('blomstra-trello.last_used_lane_id', $lane);
+        }
+    }
+
+    private function rememberLastUsedBoardId(string $shortLink): void
+    {
+        $currentSetting = $this->settings->get('blomstra-trello.default_board_id');
+
+        if (strcmp($currentSetting, $shortLink) != 0) {
+            $this->settings->set('blomstra-trello.default_board_id', $shortLink);
         }
     }
 
