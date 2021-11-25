@@ -101,7 +101,7 @@ class SaveTrelloIdToDatabase
     {
         $currentSetting = $this->settings->get('blomstra-trello.last_used_lane_id');
 
-        if (strcmp($currentSetting, $lane) != 0) {
+        if (strcmp($currentSetting, $lane) !== 0) {
             $this->settings->set('blomstra-trello.last_used_lane_id', $lane);
         }
     }
@@ -110,7 +110,7 @@ class SaveTrelloIdToDatabase
     {
         $currentSetting = $this->settings->get('blomstra-trello.default_board_id');
 
-        if (strcmp($currentSetting, $shortLink) != 0) {
+        if (strcmp($currentSetting, $shortLink) !== 0) {
             $this->settings->set('blomstra-trello.default_board_id', $shortLink);
         }
     }
