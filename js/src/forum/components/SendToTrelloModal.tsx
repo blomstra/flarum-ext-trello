@@ -197,6 +197,8 @@ export default class SendToTrelloModal extends Modal {
           app.current.stream.update();
         }
 
+        app.forum.data.attributes.trelloDefaultBoardId = selected.board.short_link;
+        app.forum.data.attributes.trelloLastUsedLaneId = selected.lane;
         m.redraw();
 
         this.loading = false;
