@@ -3,6 +3,7 @@ import icon from 'flarum/common/helpers/icon';
 import Button from 'flarum/common/components/Button';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import NewTagMappingModal from "./NewTagMappingModal";
 import Link from 'flarum/common/components/Link';
 
 export interface Board {
@@ -106,6 +107,27 @@ export default class TrelloSettingsPage extends ExtensionPage {
 
     this.loading = false;
     m.redraw();
+  }
+
+  addNewTagMappingButton(): JSX.Element {
+    return (
+      <Button
+        disabled={this.loading}
+        class="Button"
+        onclick={() =>
+          app.modal.show(NewTagMappingModal, {
+            standardTags: this.state.tags?.filter((tag) => !tag.isProject()),
+            projectTags: this.state.projectTags,
+            onClose: (projectTagId: string, standardTagId: string) => {
+              this.state.mappings![projectTagId] = standardTagId;
+              this.state.dirty = true;
+            },
+          })
+        }
+      >
+        {app.translator.trans('blomstra-list-your-project.admin.settings.mapping.add_new')}
+      </Button>
+    );
   }
 
   content() {
@@ -221,7 +243,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
           )}
           <hr />
           <div class="Form-group">
-            <h3>{app.translator.trans('blomstra-trello.admin.settings.label.optional')}</h3>
+            <h3>{app.translator.trans('blomstra-trello.admin.settings.label.labels')}</h3>
             {this.buildSettingComponent({
               type: 'boolean',
               setting: 'blomstra-trello.include_secondary_tags_as_trello_labels',
@@ -229,6 +251,9 @@ export default class TrelloSettingsPage extends ExtensionPage {
               help: app.translator.trans('blomstra-trello.admin.settings.include_secondary_tags_help'),
             })}
           </div>
+
+          {this.addNewTagMappingButton()}
+
           <div class="Form-group">{this.submitButton()}</div>
         </div>
       </div>,
