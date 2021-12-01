@@ -21,8 +21,8 @@ class TrelloLabelSerializer extends AbstractSerializer
     protected function getDefaultAttributes($label)
     {
         return [
-            'id'   => $label->id,
-            'name' => $label->name,
+            'id'    => $label->id,
+            'name'  => $label->name,
             'color' => $label->color,
         ];
     }
