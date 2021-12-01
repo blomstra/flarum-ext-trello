@@ -29,7 +29,9 @@ blomstra-trello:
         boards: Boards Settings
         labels: Labels Settings
       mapping:
+        add_new: Add mapping
         mapping_description: will become
+        modal_title: New tag mapping
         no_mappings_for_board: There are no active tag mappings assigned for this board
       mappings_label: Forum tags to Trello labels mappings
       member_id_help: Enter the Trello Member ID to be used for fetching organization boards with Trello. (https://trello.com/your-trello-handle)

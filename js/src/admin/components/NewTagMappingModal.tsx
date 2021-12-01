@@ -53,12 +53,12 @@ export default class NewTagMappingModal extends Modal {
   }
 
   className() {
-    return 'BlomstraListProject-NewTagMappingModal Modal--small';
+    return 'BlomstraTrello-NewTagMappingModal Modal--small';
   }
 
   title() {
 
-    return app.translator.trans('blomstra-list-your-project.admin.settings.mapping.modal_title');
+    return app.translator.trans('blomstra-trello.admin.settings.mapping.modal_title');
   }
 
   getTagDisplayName(tag: Tag) {
@@ -101,8 +101,6 @@ export default class NewTagMappingModal extends Modal {
                       name: target.selectedOptions[0].textContent.split(' ')[1] || app.translator.trans('blomstra-trello.admin.settings.no_label_name'),
                       color,
                     }
-
-                    console.log(this.selected.label)
                   }}
                 >
                   {this.states.labels.map((item) => {
@@ -146,7 +144,7 @@ export default class NewTagMappingModal extends Modal {
             this.hide();
           }}
         >
-          {app.translator.trans('blomstra-list-your-project.admin.settings.mapping.add_new')}
+          {app.translator.trans('blomstra-trello.admin.settings.mapping.add_new')}
         </Button>
       </div>
     );
@@ -162,14 +160,8 @@ export default class NewTagMappingModal extends Modal {
 
     this.states.labels = response.data;
 
-    let label = this.states.labels[0]
-
     this.selected.board = param.short_link;
-    this.selected.label = {
-      id: label.id,
-      name: label.attributes.name,
-      color: label.attributes.color
-    }
+
 
     m.redraw();
   }

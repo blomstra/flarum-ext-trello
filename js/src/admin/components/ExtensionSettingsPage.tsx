@@ -161,7 +161,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
           })
         }
       >
-        {app.translator.trans('blomstra-list-your-project.admin.settings.mapping.add_new')}
+        {app.translator.trans('blomstra-trello.admin.settings.mapping.add_new')}
       </Button>
     );
   }
@@ -338,21 +338,34 @@ export default class TrelloSettingsPage extends ExtensionPage {
             <div class="BlomstraTrello-mappings">
                 {
                   this.states.databaseBoards.map(databaseBoard => {
-                    return this.states.mappings[databaseBoard.short_link] !== undefined ? (
-                      [<h4>{databaseBoard.name}</h4>, (<div class="Form-group">{this.states.mappings[databaseBoard.short_link].map(mapping => {
+                    return this.states.mappings[databaseBoard.short_link] !== undefined && this.states.mappings[databaseBoard.short_link].length > 0 ? (
+                      [<h4>{databaseBoard.name}</h4>, (<div>{this.states.mappings[databaseBoard.short_link].map((mapping, i) => {
 
                           const tag = this.getTag(mapping.tagId);
 
                           if (tag !== undefined) {
 
                             return (
-                              <>
+                              <p>
+                                <Button
+                                  class="Button Button--icon"
+                                  icon="fas fa-minus"
+                                  onclick={() => {
+                                    // console.log(i)
+                                    this.states.mappings[databaseBoard.short_link].splice(i, 1);
+
+                                    console.log(this.states.mappings[databaseBoard.short_link])
+                                    // this.state.dirty = true;
+                                  }}
+                                />
+                                &nbsp;
                                 {app.translator.trans('blomstra-trello.admin.settings.tag')}&nbsp;
                                 {tagsLabel(getDisplayTags(tag))}
                                 <span>&nbsp;{app.translator.trans('blomstra-trello.admin.settings.mapping.mapping_description')}&nbsp;</span>
                                 {displayLabel(mapping.label)} {app.translator.trans('blomstra-trello.admin.settings.in_trello')}
                                 <span/>
-                              </>
+
+                              </p>
                             )
                           }
                       })}</div>)]
