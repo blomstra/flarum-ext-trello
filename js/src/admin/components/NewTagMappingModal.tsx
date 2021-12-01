@@ -36,7 +36,7 @@ export default class NewTagMappingModal extends Modal {
 
     this.states = this.attrs.states;
 
-    this.states.tags = this.states.tags?.map(tag => {
+    this.tags = this.states.tags?.map(tag => {
       return {
         id: tag.data.id,
         name: tag.data.attributes.name,
@@ -105,12 +105,12 @@ export default class NewTagMappingModal extends Modal {
 
         <div>
           <label>{app.translator.trans('blomstra-trello.admin.modals.fields.forum_tags')}</label>
-          {this.states.tags ? (
+          {this.tags ? (
             <Select
               onchange={(e: InputEvent) => {
                 this.selected.tag = e;
               }}
-              options={this.states.tags?.reduce((acc, curr) => {
+              options={this.tags?.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;
                 return acc;
               }, {})}

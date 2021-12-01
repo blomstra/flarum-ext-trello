@@ -137,9 +137,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
 
   getTag(id: string): Tag | undefined {
 
-    return this.states.tags?.find(function (tag) {
-      return tag.id == String(id);
-    });
+    return this.states.tags?.find((tag) => tag.id() === String(id));
   }
 
   addNewTagMappingButton(): JSX.Element {
@@ -307,15 +305,24 @@ export default class TrelloSettingsPage extends ExtensionPage {
                 {
                   this.states.databaseBoards.map(databaseBoard => {
                     return this.states.mappings[databaseBoard.short_link] !== undefined ? (
-                        this.states.mappings[databaseBoard.short_link].map(mapping => {
+
+                      [<h4>{databaseBoard.name}</h4>, (<div class="Form-group">{this.states.mappings[databaseBoard.short_link].map(mapping => {
 
                           const tag = this.getTag(mapping.tagId);
 
-                          console.log(tag)
                           if (tag !== undefined) {
-                            return [tagsLabel(getDisplayTags(tag))];
+
+                            return (
+                              <>
+                                {tagsLabel(getDisplayTags(tag))}
+                                <span>{app.translator.trans('blomstra-list-your-project.admin.settings.mapping.mapping_description')}</span>
+                                {tagsLabel(getDisplayTags(tag))}
+                                <span/>
+                              </>
+                            )
+
                           }
-                        })
+                      })}</div>)]
                       ) : (
                         <>
                           <h4>{databaseBoard.name}</h4>
