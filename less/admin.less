@@ -15,11 +15,12 @@
 
     width: max-content;
 
-    display: grid;
+    display: flex;
     grid-template-columns: auto auto auto 1fr auto;
-    gap: 8px;
-    align-items: center;
-    justify-items: center;
+
+    align-items: flex-start;
+    justify-items: flex-end;
+    flex-direction: column;
 
     .Placeholder {
       grid-column: ~"1 / 6";

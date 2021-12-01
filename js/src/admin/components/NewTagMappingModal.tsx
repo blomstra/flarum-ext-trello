@@ -17,7 +17,7 @@ interface IModalAttrs {
   standardTags: Tag[];
   projectTags: Tag[];
   states: IState;
-  onClose(projectTagId: string, standardTagId: string): void;
+  onClose(boardShortLink: string, label: {}, tagId: string): void;
 }
 
 interface IState {
@@ -88,15 +88,32 @@ export default class NewTagMappingModal extends Modal {
         <div>
           <label>{app.translator.trans('blomstra-trello.admin.modals.fields.trello_label')}</label>
           {this.states.labels ? (
-            <Select
-              onchange={(e: InputEvent) => {
-                this.selected.label = e;
-              }}
-              options={this.states.labels?.reduce((acc, curr) => {
-                acc[curr.attributes.id] = '(' + curr.attributes.color + ') ' + curr.attributes.name;
-                return acc;
-              }, {})}
-            />
+              <span class="Select">
+                <select
+                  class="Select-input FormControl"
+                  onchange={(e: InputEvent) => {
+                    const target = e.currentTarget as HTMLSelectElement;
+                    const colorWithNameArr = target.selectedOptions[0].textContent.split(' ');
+                    let color = colorWithNameArr[0].replace(/[{()}]/g, '');
+
+                    this.selected.label = {
+                      id: target.value,
+                      name: target.selectedOptions[0].textContent.split(' ')[1] || app.translator.trans('blomstra-trello.admin.settings.no_label_name'),
+                      color,
+                    }
+
+                    console.log(this.selected.label)
+                  }}
+                >
+                  {this.states.labels.map((item) => {
+
+                    return (
+                      <option value={item.attributes.id}>{'(' + item.attributes.color + ') ' + item.attributes.name }</option>
+                    );
+                  })}
+                </select>
+                {icon('fas fa-sort Select-caret')}
+              </span>
           ) : (
             <p>{app.translator.trans('blomstra-trello.admin.modals.no_available_labels_label')}</p>
           )}
@@ -143,9 +160,16 @@ export default class NewTagMappingModal extends Modal {
       url: app.forum.attribute('apiUrl') + `/blomstra/trello/api-boards/${param.short_link}/labels`,
     });
 
-    this.selected.board = param.short_link;
-
     this.states.labels = response.data;
+
+    let label = this.states.labels[0]
+
+    this.selected.board = param.short_link;
+    this.selected.label = {
+      id: label.id,
+      name: label.attributes.name,
+      color: label.attributes.color
+    }
 
     m.redraw();
   }

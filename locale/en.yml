@@ -1,40 +1,44 @@
 blomstra-trello:
   admin:
+    modals:
+      fields:
+        board: Select a Trello board
+        trello_label: Select a Trello label
+        forum_tags: Select a Forum tag to map
+      no_available_labels_label: No available labels
+      no_available_tags_label: No available forum tags
     permissions:
       add_to_trello: Can link a discussion to Trello
     settings:
-      button:
-        add: Add
-        remove: Remove
-      label:
-        general: General
-        boards: Boards Settings
-        labels: Labels Settings
       api_key_help: Enter the API key from {link} in order for this extension to connect with Trello.
       api_key_label: API Key
       api_token_help: Enter the API token in order for this extension to connect with Trello. Visit {link} and click <code>Generate a Token</code>
       api_token_label: API Token
       available_boards_label: Available boards
+      button:
+        add: Add
+        remove: Remove
       default_board_help: The selected default board will be the one that will be pre-selected in the Send to Trello modal in the forum.
       default_board_label: Default board
       guest_workspace: Guest Workspace
+      in_trello: in Trello
+      include_secondary_tags_help: When disabled, only primary discussion tags will be sent to Trello. When enabled, all tags will be sent to Trello.
+      include_secondary_tags_label: Include secondary tags
+      label:
+        general: General
+        boards: Boards Settings
+        labels: Labels Settings
+      mapping:
+        mapping_description: will become
+        no_mappings_for_board: There are no active tag mappings assigned for this board
+      mappings_label: Forum tags to Trello labels mappings
       member_id_help: Enter the Trello Member ID to be used for fetching organization boards with Trello. (https://trello.com/your-trello-handle)
       member_id_label: Member ID
       no_available_boards_label: No available boards
+      no_label_name: No label name
       no_selected_boards_label: No selected boards
       selected_boards_label: Selected boards
-      include_secondary_tags_label: Include secondary tags
-      include_secondary_tags_help: When disabled, only primary discussion tags will be sent to Trello. When enabled, all tags will be sent to Trello.
-      mapping:
-        no_mappings_for_board: There are no active tag mappings assigned for this board
-      mappings_label: Forum tags to Trello labels mappings
-    modals:
-      fields:
-        board: Select a Trello board
-        trello_label: Select a Trello label
-        forum_tags: Select a Trello label
-      no_available_labels_label: No available labels
-      no_available_tags_label: No available forum tags
+      tag: Tag
 
   forum:
     badges:
