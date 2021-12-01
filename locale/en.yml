@@ -25,6 +25,16 @@ blomstra-trello:
       selected_boards_label: Selected boards
       include_secondary_tags_label: Include secondary tags
       include_secondary_tags_help: When disabled, only primary discussion tags will be sent to Trello. When enabled, all tags will be sent to Trello.
+      mapping:
+        no_mappings_for_board: There are no active tag mappings assigned for this board
+      mappings_label: Forum tags to Trello labels mappings
+    modals:
+      fields:
+        board: Select a Trello board
+        trello_label: Select a Trello label
+        forum_tags: Select a Trello label
+      no_available_labels_label: No available labels
+      no_available_tags_label: No available forum tags
 
   forum:
     badges:
@@ -38,7 +48,6 @@ blomstra-trello:
         board: Select a Trello board
         lane: Select a Trello lane
       no_available_boards_label: No available boards
-      select_a_board_label: -- Select a board --
       title: Send to Trello
 
   lib:

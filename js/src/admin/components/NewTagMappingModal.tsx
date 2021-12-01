@@ -4,32 +4,60 @@ import Button from 'flarum/common/components/Button';
 import Modal from 'flarum/common/components/Modal';
 import Select from 'flarum/common/components/Select';
 
-import type { Tag } from './ProjectsExtensionPage';
+import {Board, DatabaseBoard, Tag} from "./ExtensionSettingsPage";
+import icon from "flarum/common/helpers/icon";
+import Separator from "flarum/common/components/Separator";
+
+export interface Label {
+  name(): string;
+  shortLink(): string;
+}
 
 interface IModalAttrs {
   standardTags: Tag[];
   projectTags: Tag[];
+  states: IState;
   onClose(projectTagId: string, standardTagId: string): void;
 }
 
 interface IState {
-  projectTag: string | null;
-  tag: string | null;
+  loading: boolean;
+  databaseBoards: DatabaseBoard[] | null;
+  allBoards: Board[] | null;
+  labels: Label[] | null;
+  tags: Tag[] | null;
 }
 
 export default class NewTagMappingModal extends Modal {
   attrs!: IModalAttrs;
 
-  state: IState = {
-    projectTag: null,
-    tag: null,
-  };
+  oninit(vnode) {
+    super.oninit(vnode);
+
+    this.states = this.attrs.states;
+
+    this.states.tags = this.states.tags?.map(tag => {
+      return {
+        id: tag.data.id,
+        name: tag.data.attributes.name,
+        color: tag.data.attributes.color,
+        slug: tag.data.attributes.slug,
+      };
+    })
+
+    this.selected = {
+      board: null,
+      label: null,
+      tag: null
+    }
+  }
 
   className() {
     return 'BlomstraListProject-NewTagMappingModal Modal--small';
   }
 
   title() {
+
     return app.translator.trans('blomstra-list-your-project.admin.settings.mapping.modal_title');
   }
 
@@ -43,32 +71,61 @@ export default class NewTagMappingModal extends Modal {
     return (
       <div class="Modal-body">
         <div>
-          <label>{app.translator.trans('blomstra-list-your-project.admin.settings.mapping.project_tag')}</label>
+          <label>{app.translator.trans('blomstra-trello.admin.modals.fields.board')}</label>
           <Select
-            onchange={(val: string) => (this.state.projectTag = val)}
-            options={this.attrs.projectTags.reduce((acc, tag: Tag) => {
-              acc[tag.id()] = this.getTagDisplayName(tag);
+            onchange={(e: InputEvent) => {
+              this.loadTrelloLabels({
+                short_link: e,
+              });
+            }}
+            options={this.states.databaseBoards.reduce((acc, curr) => {
+              acc[curr.short_link] = curr.name;
               return acc;
-            }, {} as Record<string, string>)}
+            }, {})}
           />
         </div>
 
         <div>
-          <label>{app.translator.trans('blomstra-list-your-project.admin.settings.mapping.tag')}</label>
-          <Select
-            onchange={(val: string) => (this.state.tag = val)}
-            options={this.attrs.standardTags.reduce((acc, tag: Tag) => {
-              acc[tag.id()] = this.getTagDisplayName(tag);
-              return acc;
-            }, {} as Record<string, string>)}
-          />
+          <label>{app.translator.trans('blomstra-trello.admin.modals.fields.trello_label')}</label>
+          {this.states.labels ? (
+            <Select
+              onchange={(e: InputEvent) => {
+                this.selected.label = e;
+              }}
+              options={this.states.labels?.reduce((acc, curr) => {
+                acc[curr.attributes.id] = '(' + curr.attributes.color + ') ' + curr.attributes.name;
+                return acc;
+              }, {})}
+            />
+          ) : (
+            <p>{app.translator.trans('blomstra-trello.admin.modals.no_available_labels_label')}</p>
+          )}
+
+        </div>
+
+        <div>
+          <label>{app.translator.trans('blomstra-trello.admin.modals.fields.forum_tags')}</label>
+          {this.states.tags ? (
+            <Select
+              onchange={(e: InputEvent) => {
+                this.selected.tag = e;
+              }}
+              options={this.states.tags?.reduce((acc, curr) => {
+                acc[curr.id] = curr.name;
+                return acc;
+              }, {})}
+            />
+          ) : (
+            <p>{app.translator.trans('blomstra-trello.admin.modals.no_available_tags_label')}</p>
+          )}
+
         </div>
 
         <Button
           class="Button Button--primary"
-          disabled={this.state.projectTag === null || this.state.tag === null}
+          disabled={this.selected.board === null || this.selected.label === null || this.selected.tag === null}
           onclick={() => {
-            this.attrs.onClose(this.state.projectTag, this.state.tag);
+            this.attrs.onClose(this.selected.board, this.selected.label, this.selected.tag);
             this.hide();
           }}
         >
@@ -76,5 +133,20 @@ export default class NewTagMappingModal extends Modal {
         </Button>
       </div>
     );
+  }
+
+  private async loadTrelloLabels(param: { short_link: string }) {
+
+    // load labels based on the currently selected board
+    const response = await app.request({
+      method: 'GET',
+      url: app.forum.attribute('apiUrl') + `/blomstra/trello/api-boards/${param.short_link}/labels`,
+    });
+
+    this.selected.board = param.short_link;
+
+    this.states.labels = response.data;
+
+    m.redraw();
   }
 }

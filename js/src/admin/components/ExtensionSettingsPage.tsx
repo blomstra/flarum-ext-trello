@@ -5,6 +5,8 @@ import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import NewTagMappingModal from "./NewTagMappingModal";
 import Link from 'flarum/common/components/Link';
+import tagsLabel from 'flarum/tags/helpers/tagsLabel';
+import sortTags from 'flarum/tags/utils/sortTags';
 
 export interface Board {
   organization(): string;
@@ -16,10 +18,31 @@ export interface DatabaseBoard {
   shortLink(): string;
 }
 
+export interface Tag {
+  backgroundMode(): string;
+  backgroundUrl(): string;
+  // children():
+  color(): string;
+  discussionCount(): number;
+  icon(): string;
+  isChild(): boolean;
+  isHidden(): boolean;
+  isPrimary(): boolean;
+  name(): string;
+  description(): string;
+  // parent():
+  position(): number;
+  slug(): string;
+  id(): string;
+}
+
+
 interface IState {
   loading: boolean;
   databaseBoards: DatabaseBoard[] | null;
   allBoards: Board[] | null;
+  mappings: [],
+  tags: Tag[] | null,
 }
 
 export default class TrelloSettingsPage extends ExtensionPage {
@@ -27,6 +50,8 @@ export default class TrelloSettingsPage extends ExtensionPage {
     loading: false,
     databaseBoards: null,
     allBoards: null,
+    mappings: [],
+    tags: null,
   };
 
   oninit(vnode) {
@@ -37,6 +62,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
 
     this.loadDatabaseData();
     this.loadTrelloData();
+    this.loadFlarumTags();
   }
 
   async loadDatabaseData() {
@@ -109,6 +135,13 @@ export default class TrelloSettingsPage extends ExtensionPage {
     m.redraw();
   }
 
+  getTag(id: string): Tag | undefined {
+
+    return this.states.tags?.find(function (tag) {
+      return tag.id == String(id);
+    });
+  }
+
   addNewTagMappingButton(): JSX.Element {
     return (
       <Button
@@ -116,11 +149,16 @@ export default class TrelloSettingsPage extends ExtensionPage {
         class="Button"
         onclick={() =>
           app.modal.show(NewTagMappingModal, {
-            standardTags: this.state.tags?.filter((tag) => !tag.isProject()),
-            projectTags: this.state.projectTags,
-            onClose: (projectTagId: string, standardTagId: string) => {
-              this.state.mappings![projectTagId] = standardTagId;
-              this.state.dirty = true;
+            states: this.states,
+            onClose: (boardShortLink: string, labelId: string, tagId: Number) => {
+
+              if (this.states.mappings[boardShortLink] === undefined) {
+                this.states.mappings[boardShortLink] = [];
+              }
+
+              this.states.mappings[boardShortLink].push({labelId, tagId});
+
+              m.redraw();
             },
           })
         }
@@ -130,7 +168,18 @@ export default class TrelloSettingsPage extends ExtensionPage {
     );
   }
 
+  private async loadFlarumTags() {
+    await app.store.find('tags', { include: 'parent' });
+
+    this.states.tags = sortTags(app.store.all('tags'));
+  }
+
   content() {
+
+    function getDisplayTags(tag) {
+      return [tag];
+    }
+
     const link = (
       <Link href="https://trello.com/app-key" external={true} target="_blank">
         https://trello.com/app-key
@@ -252,8 +301,36 @@ export default class TrelloSettingsPage extends ExtensionPage {
             })}
           </div>
 
-          {this.addNewTagMappingButton()}
+          <div class="Form-group">
+            <label>{app.translator.trans('blomstra-trello.admin.settings.mappings_label')}</label>
+            <div class="BlomstraTrello-mappings">
+                {
+                  this.states.databaseBoards.map(databaseBoard => {
+                    return this.states.mappings[databaseBoard.short_link] !== undefined ? (
+                        this.states.mappings[databaseBoard.short_link].map(mapping => {
 
+                          const tag = this.getTag(mapping.tagId);
+
+                          console.log(tag)
+                          if (tag !== undefined) {
+                            return [tagsLabel(getDisplayTags(tag))];
+                          }
+                        })
+                      ) : (
+                        <>
+                          <h4>{databaseBoard.name}</h4>
+                          <div class="Placeholder">
+                            <p>{app.translator.trans('blomstra-trello.admin.settings.mapping.no_mappings_for_board')}</p>
+                          </div>
+                        </>
+                    )})
+                }
+
+            </div>
+          </div>
+          <div class="Form-group">
+            {this.addNewTagMappingButton()}
+          </div>
           <div class="Form-group">{this.submitButton()}</div>
         </div>
       </div>,
