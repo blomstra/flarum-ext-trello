@@ -14,8 +14,6 @@ export interface Label {
 }
 
 interface IModalAttrs {
-  standardTags: Tag[];
-  projectTags: Tag[];
   states: IState;
   onClose(boardShortLink: string, label: {}, tagId: string): void;
 }
@@ -161,7 +159,6 @@ export default class NewTagMappingModal extends Modal {
     this.states.labels = response.data;
 
     this.selected.board = param.short_link;
-
 
     m.redraw();
   }

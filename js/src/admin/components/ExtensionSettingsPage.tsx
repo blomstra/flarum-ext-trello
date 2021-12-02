@@ -150,14 +150,23 @@ export default class TrelloSettingsPage extends ExtensionPage {
             states: this.states,
             onClose: (boardShortLink: string, label: {}, tagId: string) => {
 
+              let exists = false;
+
               if (this.states.mappings[boardShortLink] === undefined) {
                 this.states.mappings[boardShortLink] = [];
+
+                return;
               }
 
-              this.states.mappings[boardShortLink].push({label, tagId});
+              if (this.states.mappings[boardShortLink].length) {
+                exists = this.states.mappings[boardShortLink].filter((value) => value.tagId == tagId);
 
-              m.redraw();
-            },
+                if (!exists) {
+                  this.states.mappings[boardShortLink].push({label, tagId});
+                  m.redraw();
+                }
+              }
+            }
           })
         }
       >
@@ -325,15 +334,6 @@ export default class TrelloSettingsPage extends ExtensionPage {
           <hr />
           <div class="Form-group">
             <h3>{app.translator.trans('blomstra-trello.admin.settings.label.labels')}</h3>
-            {this.buildSettingComponent({
-              type: 'boolean',
-              setting: 'blomstra-trello.include_secondary_tags_as_trello_labels',
-              label: app.translator.trans('blomstra-trello.admin.settings.include_secondary_tags_label'),
-              help: app.translator.trans('blomstra-trello.admin.settings.include_secondary_tags_help'),
-            })}
-          </div>
-
-          <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.admin.settings.mappings_label')}</label>
             <div class="BlomstraTrello-mappings">
                 {
