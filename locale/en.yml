@@ -40,6 +40,7 @@ blomstra-trello:
       no_label_name: No label name
       no_selected_boards_label: No selected boards
       selected_boards_label: Selected boards
+      save: Save changes
       tag: Tag
 
   forum:
@@ -54,6 +55,7 @@ blomstra-trello:
         board: Select a Trello board
         lane: Select a Trello lane
       no_available_boards_label: No available boards
+      no_mappings_for_board: Current selected board does not have mappings set
       title: Send to Trello
 
   lib:

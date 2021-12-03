@@ -17,6 +17,7 @@ interface IState {
   loading: boolean;
   boards: DatabaseBoard[] | null;
   lanes: BoardLane[] | null;
+  mappings: {},
 }
 
 export default class SendToTrelloModal extends Modal {
@@ -24,6 +25,7 @@ export default class SendToTrelloModal extends Modal {
     loading: false,
     boards: null,
     lanes: null,
+    mappings: {},
   };
 
   title() {
@@ -37,6 +39,7 @@ export default class SendToTrelloModal extends Modal {
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.forum.modals.fields.board')}</label>
             {this.states.boards ? (
+              <>
               <span class="Select">
                 <select
                   class="Select-input FormControl"
@@ -60,6 +63,13 @@ export default class SendToTrelloModal extends Modal {
                 </select>
                 {icon('fas fa-sort Select-caret')}
               </span>
+              {
+                this.defaultBoardMapping.length == 0 ? (
+                  <div class="warningText">{app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}</div>
+                ) : ('')
+              }
+
+              </>
             ) : (
               <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_boards_label')}</p>
             )}
@@ -114,6 +124,7 @@ export default class SendToTrelloModal extends Modal {
 
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
     this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
+    this.defaultBoardMapping = [];
 
     this.loadData();
   }
@@ -122,6 +133,8 @@ export default class SendToTrelloModal extends Modal {
     this.loading = true;
 
     this.states.boards = app.forum.attribute('trelloBoards');
+
+    this.loadMappings();
 
     if (this.states.boards.length) {
       const item = {
@@ -144,6 +157,8 @@ export default class SendToTrelloModal extends Modal {
     };
 
     this.defaultBoardId = item.short_link;
+
+    this.defaultBoardMapping = this.states.mappings[item.short_link];
   }
 
   setCurrentSelectedLane(item) {
@@ -209,5 +224,16 @@ export default class SendToTrelloModal extends Modal {
 
   className() {
     return 'Modal--small blomstra-trello-modal';
+  }
+
+  private loadMappings() {
+    try {
+      this.states.mappings = JSON.parse(app.forum.attribute("labelTagMappings"));
+      this.defaultBoardMapping = this.states.mappings[this.defaultBoardId];
+
+    } catch {
+      this.states.mappings = {};
+      this.defaultBoardMapping = [];
+    }
   }
 }
