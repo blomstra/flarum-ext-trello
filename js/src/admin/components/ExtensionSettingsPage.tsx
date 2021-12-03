@@ -5,9 +5,10 @@ import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import NewTagMappingModal from './NewTagMappingModal';
 import Link from 'flarum/common/components/Link';
-import tagsLabel from 'flarum/tags/helpers/tagsLabel';
+import tagLabel from 'flarum/tags/helpers/tagLabel';
 import sortTags from 'flarum/tags/utils/sortTags';
 import saveSettings from 'flarum/admin/utils/saveSettings';
+import type Mithril from 'mithril';
 
 export interface Board {
   organization(): string;
@@ -155,9 +156,9 @@ export default class TrelloSettingsPage extends ExtensionPage {
                 this.states.mappings[boardShortLink] = [];
               }
 
-              const exists = this.states.mappings[boardShortLink].filter((value) => value.tagId == tagId || value.label.id == label.id);
+              const exists = this.states.mappings[boardShortLink].some((value) => value.tagId == tagId || value.label.id == label.id);
 
-              if (!exists.length) {
+              if (!exists) {
                 this.states.mappings[boardShortLink].push({ label, tagId });
 
                 this.states.dirty = true;
@@ -172,7 +173,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
     );
   }
 
-  saveButton(): JSX.Element {
+  saveButton(): Mithril.Children {
     return (
       <Button
         disabled={this.states.loading || !this.states.dirty}
@@ -205,10 +206,6 @@ export default class TrelloSettingsPage extends ExtensionPage {
   }
 
   content() {
-    function getDisplayTags(tag) {
-      return [tag];
-    }
-
     function displayLabel(label: {}) {
       let attrs = {};
 
@@ -377,7 +374,7 @@ export default class TrelloSettingsPage extends ExtensionPage {
                               />
                               &nbsp;
                               {app.translator.trans('blomstra-trello.admin.settings.tag')}&nbsp;
-                              {tagsLabel(getDisplayTags(tag))}
+                              {tagLabel(tag)}
                               <span>&nbsp;{app.translator.trans('blomstra-trello.admin.settings.mapping.mapping_description')}&nbsp;</span>
                               {displayLabel(mapping.label)} {app.translator.trans('blomstra-trello.admin.settings.in_trello')}
                               <span />
