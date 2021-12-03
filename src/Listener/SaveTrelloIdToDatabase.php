@@ -125,7 +125,7 @@ class SaveTrelloIdToDatabase
                 $boardMappings = Arr::get($mappings, $shortLink);
 
                 if ($boardMappings) {
-                    $discussion->tags->each(function ($tag) use ($client, $boardMappings, $board, $card) {
+                    $discussion->tags->each(function ($tag) use ($client, $boardMappings , $card) {
                         foreach ($boardMappings as $boardMapping) {
                             if ($boardMapping['tagId'] == $tag->id) {
                                 $labelId = data_get($boardMapping, 'label.id');
