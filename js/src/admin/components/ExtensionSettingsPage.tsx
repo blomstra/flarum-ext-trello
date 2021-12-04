@@ -352,12 +352,12 @@ export default class TrelloSettingsPage extends ExtensionPage {
             <h3>{app.translator.trans('blomstra-trello.admin.settings.label.labels')}</h3>
             <label>{app.translator.trans('blomstra-trello.admin.settings.mappings_label')}</label>
             <div class="BlomstraTrello-mappings">
-              {this.states.databaseBoards.map((databaseBoard) => {
-                return this.states.mappings[databaseBoard.short_link] !== undefined && this.states.mappings[databaseBoard.short_link].length > 0 ? (
+              {this.states.databaseBoards?.map((databaseBoard) => {
+                return this.states.mappings?.[databaseBoard.short_link] !== undefined && this.states.mappings[databaseBoard.short_link].length > 0 ? (
                   [
                     <h4>{databaseBoard.name}</h4>,
                     <div>
-                      {this.states.mappings[databaseBoard.short_link].map((mapping, i) => {
+                      {this.states.mappings[databaseBoard.short_link]?.map((mapping, i) => {
                         const tag = this.getTag(mapping.tagId);
 
                         if (tag !== undefined) {
