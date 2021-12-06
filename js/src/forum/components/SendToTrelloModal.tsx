@@ -5,13 +5,20 @@ import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import tagLabel from 'flarum/tags/helpers/tagLabel';
+import MultiDropdown, { IMultiDropdownItem } from '../../common/MultiDropdown';
 
 export interface DatabaseBoard {
   name: string;
   short_link: string;
 }
+
 export interface BoardLane {
   name: string;
+  id: string;
+}
+
+export interface BoardMember {
+  fullName: string;
   id: string;
 }
 
@@ -19,6 +26,7 @@ interface IState {
   loading: boolean;
   boards: DatabaseBoard[] | null;
   lanes: BoardLane[] | null;
+  members: BoardMember[] | null;
   mappings: {};
 }
 
@@ -45,6 +53,7 @@ export default class SendToTrelloModal extends Modal {
     loading: false,
     boards: null,
     lanes: null,
+    members: null,
     mappings: {},
   };
 
@@ -131,7 +140,23 @@ export default class SendToTrelloModal extends Modal {
                 {icon('fas fa-sort Select-caret')}
               </span>
             ) : (
-              <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_boards_label')}</p>
+              <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_board_lanes')}</p>
+            )}
+          </div>
+          <div class="Form-group">
+            <label>{app.translator.trans('blomstra-trello.forum.modals.fields.member')}</label>
+            {this.states.members ? (
+              <MultiDropdown
+                label={app.translator.trans('blomstra-trello.forum.modals.fields.member')}
+                buttonClassName="Button"
+                updateOnClose
+                items={this.states.members.map((item) => {
+                  return { key: item.attributes.id, label: item.attributes.fullName, value: item.attributes.id };
+                })}
+                onchange={console.log}
+              />
+            ) : (
+              <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_board_members')}</p>
             )}
           </div>
           <div class="Form-group">
@@ -152,7 +177,10 @@ export default class SendToTrelloModal extends Modal {
     this.selected = {
       board: null,
       lane: null,
+      members: [],
     };
+
+    console.log(this.selected);
 
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
     this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
@@ -198,9 +226,16 @@ export default class SendToTrelloModal extends Modal {
     this.selected.lane = item.id;
   }
 
+  setCurrentSelectedMembers(item) {
+    if (!this.selected.members.includes(item.id)) {
+      this.selected.members.push(item.id);
+    }
+  }
+
   async loadTrelloLanes(item) {
     this.states.lanes = null;
     this.tagsWithoutMappings = [];
+    this.states.members = null;
     this.disabled = true;
 
     this.setCurrentSelectedBoard(item);
@@ -213,7 +248,7 @@ export default class SendToTrelloModal extends Modal {
 
     const data = response.data;
     this.states.lanes = data;
-    if (this.states.lanes.length) {
+    if (this.states.lanes?.length) {
       const laneExists = this.states.lanes?.some?.((item) => item.id === this.defaultLaneId);
 
       if (laneExists) {
@@ -232,7 +267,25 @@ export default class SendToTrelloModal extends Modal {
       return !tagIds.includes(item.data.id);
     });
 
+    this.loadTrelloMembers();
+
     this.disabled = false;
+
+    m.redraw();
+  }
+
+  async loadTrelloMembers() {
+    // load members based on the currently selected board
+    const response = await app.request({
+      method: 'GET',
+      url: app.forum.attribute('apiUrl') + `/blomstra/trello/api-boards/${this.selected.board.short_link}/members`,
+    });
+
+    const data = response.data;
+    this.states.members = data;
+    // if (this.states.members?.length) {
+    //   this.setCurrentSelectedMembers({ id: this.states.members[0].attributes.id });
+    // }
 
     m.redraw();
   }
@@ -245,23 +298,25 @@ export default class SendToTrelloModal extends Modal {
 
     this.loading = true;
 
-    discussion
-      .save({
-        trello: selected,
-      })
-      .then(() => {
-        if (app.current instanceof DiscussionPage) {
-          app.current.stream.update();
-        }
-
-        app.forum.data.attributes.trelloDefaultBoardId = selected.board.short_link;
-        app.forum.data.attributes.trelloLastUsedLaneId = selected.lane;
-        m.redraw();
-
-        this.loading = false;
-
-        this.hide();
-      });
+    // discussion
+    //   .save({
+    //     trello: selected,
+    //   })
+    //   .then(() => {
+    //     if (app.current instanceof DiscussionPage) {
+    //       app.current.stream.update();
+    //     }
+    //
+    //     app.forum.data.attributes.trelloDefaultBoardId = selected.board.short_link;
+    //     app.forum.data.attributes.trelloLastUsedLaneId = selected.lane;
+    //
+    //     m.redraw();
+    //
+    //     this.loading = false;
+    //
+    //     this.hide();
+    //   });
+    console.log(selected);
   }
 
   className() {

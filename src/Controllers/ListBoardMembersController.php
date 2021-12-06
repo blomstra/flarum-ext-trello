@@ -11,47 +11,56 @@
 
 namespace Blomstra\Trello\Controllers;
 
-use Blomstra\Trello\Serializer\TrelloLabelSerializer;
+use Blomstra\Trello\Serializer\TrelloMemberSerializer;
+use Blomstra\Trello\ValidateTrelloSettings;
 use Exception;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use Trello\Client as TrelloClient;
+use Trello\Client;
 use Trello\Models\Board;
 
-class ListLabelsBoardController extends AbstractListController
+class ListBoardMembersController extends AbstractListController
 {
     /**
-     * @var TrelloClient
+     * @var SettingsRepositoryInterface
      */
-    protected $client;
+    protected $settings;
 
     /**
      * {@inheritdoc}
      */
-    public $serializer = TrelloLabelSerializer::class;
+    public $serializer = TrelloMemberSerializer::class;
 
-    public function __construct(TrelloClient $client)
+    public function __construct(SettingsRepositoryInterface $settings)
     {
-        $this->client = $client;
+        $this->settings = $settings;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        if (!$this->client) {
+        if (!ValidateTrelloSettings::Settings($this->settings)) {
             return [];
         }
 
         try {
             $board = Arr::get($request->getQueryParams(), 'board');
 
-            $board = (new Board($this->client))->setId($board)->get();
+            $apiKey = $this->settings->get('blomstra-trello.api_key');
+            $apiToken = $this->settings->get('blomstra-trello.api_token');
 
-            return $board->getLabels();
+            $client = new Client($apiKey);
+
+            $client->setAccessToken($apiToken);
+
+            $board = (new Board($client))->setId($board)->get();
+
+            return $board->getMembers();
         } catch (Exception $e) {
         }
 
