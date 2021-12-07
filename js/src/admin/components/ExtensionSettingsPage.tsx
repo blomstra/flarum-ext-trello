@@ -176,13 +176,14 @@ export default class TrelloSettingsPage extends ExtensionPage {
   saveButton(): Mithril.Children {
     return (
       <Button
-        disabled={this.states.loading || !this.states.dirty}
+        disabled={this.states.loading || (!this.states.dirty && !this.dirty())}
         class="Button Button--primary SaveButton"
         onclick={async () => {
           this.states.dirty = false;
 
           await saveSettings({
             'blomstra-trello.label-tag-mappings': JSON.stringify(this.states.mappings),
+            ...(this.dirty() ? this.dirty() : {}),
           });
         }}
       >
