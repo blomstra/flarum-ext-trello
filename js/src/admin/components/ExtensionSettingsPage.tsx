@@ -201,6 +201,10 @@ export default class TrelloSettingsPage extends ExtensionPage {
   private loadMappings() {
     try {
       this.states.mappings = JSON.parse(app.data.settings['blomstra-trello.label-tag-mappings']);
+
+      if (!this.states.mappings) {
+        this.states.mappings = {};
+      }
     } catch {
       this.states.mappings = {};
     }

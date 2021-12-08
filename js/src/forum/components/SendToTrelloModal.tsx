@@ -233,7 +233,7 @@ export default class SendToTrelloModal extends Modal {
 
   private loadMappings() {
     try {
-      this.states.mappings = JSON.parse(app.forum.attribute('labelTagMappings'));
+      this.states.mappings = JSON.parse(app.forum.attribute('trelloLabelTagMappings'));
       this.defaultBoardMapping = this.states.mappings[this.defaultBoardId];
     } catch {
       this.states.mappings = {};
