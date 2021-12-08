@@ -51,9 +51,6 @@ return [
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(TrelloAttributes::class),
 
-    (new Extend\Settings())
-        ->serializeToForum('labelTagMappings', 'blomstra-trello.label-tag-mappings'),
-
     (new Extend\Event())
         ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class),
 ];
