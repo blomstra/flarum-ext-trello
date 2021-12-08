@@ -1,5 +1,6 @@
 import app from 'flarum/forum/app';
 import icon from 'flarum/common/helpers/icon';
+import Alert from 'flarum/common/components/Alert';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
@@ -37,6 +38,17 @@ export default class SendToTrelloModal extends Modal {
       <div class="Modal-body">
         <div class="Form">
           <div class="Form-group">
+            {this.defaultBoardMapping === undefined || this.defaultBoardMapping?.length == 0 ? (
+              <span>
+                <Alert type="warning" dismissible={0}>
+                  {app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}
+                </Alert>
+              </span>
+            ) : (
+              ''
+            )}
+          </div>
+          <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.forum.modals.fields.board')}</label>
             {this.states.boards ? (
               <>
@@ -63,11 +75,6 @@ export default class SendToTrelloModal extends Modal {
                   </select>
                   {icon('fas fa-sort Select-caret')}
                 </span>
-                {this.defaultBoardMapping === undefined || this.defaultBoardMapping?.length == 0 ? (
-                  <div class="warningText">{app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}</div>
-                ) : (
-                  ''
-                )}
               </>
             ) : (
               <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_boards_label')}</p>
