@@ -235,10 +235,10 @@ export default class TrelloSettingsPage extends ExtensionPage {
       attrs.style['--tag-bg'] = colors[label.color];
       attrs.className += ' colored';
 
-      return m(
-        'span',
-        attrs,
-        <span className="TagLabel-text">{labelText || app.translator.trans('blomstra-trello.admin.settings.no_label_name')}</span>
+      return (
+        <span {...attrs}>
+          <span className="TagLabel-text">{labelText || app.translator.trans('blomstra-trello.admin.settings.no_label_name')}</span>
+        </span>
       );
     }
 
