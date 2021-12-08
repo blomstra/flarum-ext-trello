@@ -4,9 +4,9 @@ import Button from 'flarum/common/components/Button';
 import Modal from 'flarum/common/components/Modal';
 import Select from 'flarum/common/components/Select';
 
-import {Board, DatabaseBoard, Tag} from "./ExtensionSettingsPage";
-import icon from "flarum/common/helpers/icon";
-import Separator from "flarum/common/components/Separator";
+import { Board, DatabaseBoard, Tag } from './ExtensionSettingsPage';
+import icon from 'flarum/common/helpers/icon';
+import Separator from 'flarum/common/components/Separator';
 
 export interface Label {
   name(): string;
@@ -34,20 +34,20 @@ export default class NewTagMappingModal extends Modal {
 
     this.states = this.attrs.states;
 
-    this.tags = this.states.tags?.map(tag => {
+    this.tags = this.states.tags?.map((tag) => {
       return {
         id: tag.data.id,
         name: tag.data.attributes.name,
         color: tag.data.attributes.color,
         slug: tag.data.attributes.slug,
       };
-    })
+    });
 
     this.selected = {
       board: null,
       label: null,
-      tag: null
-    }
+      tag: null,
+    };
   }
 
   className() {
@@ -55,7 +55,6 @@ export default class NewTagMappingModal extends Modal {
   }
 
   title() {
-
     return app.translator.trans('blomstra-trello.admin.settings.mapping.modal_title');
   }
 
@@ -86,34 +85,30 @@ export default class NewTagMappingModal extends Modal {
         <div>
           <label>{app.translator.trans('blomstra-trello.admin.modals.fields.trello_label')}</label>
           {this.states.labels ? (
-              <span class="Select">
-                <select
-                  class="Select-input FormControl"
-                  onchange={(e: InputEvent) => {
-                    const target = e.currentTarget as HTMLSelectElement;
-                    const colorWithNameArr = target.selectedOptions[0].textContent.split(' ');
-                    let color = colorWithNameArr[0].replace(/[{()}]/g, '');
+            <span class="Select">
+              <select
+                class="Select-input FormControl"
+                onchange={(e: InputEvent) => {
+                  const target = e.currentTarget as HTMLSelectElement;
+                  const colorWithNameArr = target.selectedOptions[0].textContent.split(' ');
+                  let color = colorWithNameArr[0].replace(/[{()}]/g, '');
 
-                    this.selected.label = {
-                      id: target.value,
-                      name: target.selectedOptions[0].textContent.split(' ')[1] || app.translator.trans('blomstra-trello.admin.settings.no_label_name'),
-                      color,
-                    }
-                  }}
-                >
-                  {this.states.labels.map((item) => {
-
-                    return (
-                      <option value={item.attributes.id}>{'(' + item.attributes.color + ') ' + item.attributes.name }</option>
-                    );
-                  })}
-                </select>
-                {icon('fas fa-sort Select-caret')}
-              </span>
+                  this.selected.label = {
+                    id: target.value,
+                    name: target.selectedOptions[0].textContent.split(' ')[1] || app.translator.trans('blomstra-trello.admin.settings.no_label_name'),
+                    color,
+                  };
+                }}
+              >
+                {this.states.labels.map((item) => {
+                  return <option value={item.attributes.id}>{'(' + item.attributes.color + ') ' + item.attributes.name}</option>;
+                })}
+              </select>
+              {icon('fas fa-sort Select-caret')}
+            </span>
           ) : (
             <p>{app.translator.trans('blomstra-trello.admin.modals.no_available_labels_label')}</p>
           )}
-
         </div>
 
         <div>
@@ -131,7 +126,6 @@ export default class NewTagMappingModal extends Modal {
           ) : (
             <p>{app.translator.trans('blomstra-trello.admin.modals.no_available_tags_label')}</p>
           )}
-
         </div>
 
         <Button
@@ -149,7 +143,6 @@ export default class NewTagMappingModal extends Modal {
   }
 
   private async loadTrelloLabels(param: { short_link: string }) {
-
     // load labels based on the currently selected board
     const response = await app.request({
       method: 'GET',
