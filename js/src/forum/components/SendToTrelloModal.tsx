@@ -265,7 +265,7 @@ export default class SendToTrelloModal extends Modal {
   }
 
   className() {
-    return 'Modal--small blomstra-trello-modal';
+    return 'Modal--small Blomstra-Trello-modal';
   }
 
   private loadMappings() {
