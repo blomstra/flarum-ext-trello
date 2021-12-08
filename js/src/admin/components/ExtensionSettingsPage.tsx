@@ -396,8 +396,8 @@ export default class TrelloSettingsPage extends ExtensionPage {
               })}
             </div>
           </div>
-          {this.addNewTagMappingButton()}
-          {this.saveButton()}
+          <div class="Form-group">{this.addNewTagMappingButton()}</div>
+          <div class="Form-group">{this.saveButton()}</div>
         </div>
       </div>,
     ];
