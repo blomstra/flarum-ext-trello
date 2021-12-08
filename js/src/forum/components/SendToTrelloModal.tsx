@@ -4,6 +4,7 @@ import Alert from 'flarum/common/components/Alert';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
+import tagLabel from 'flarum/tags/helpers/tagLabel';
 
 export interface DatabaseBoard {
   name: string;
@@ -21,6 +22,24 @@ interface IState {
   mappings: {};
 }
 
+export interface Tag {
+  backgroundMode(): string;
+  backgroundUrl(): string;
+  // children():
+  color(): string;
+  discussionCount(): number;
+  icon(): string;
+  isChild(): boolean;
+  isHidden(): boolean;
+  isPrimary(): boolean;
+  name(): string;
+  description(): string;
+  // parent():
+  position(): number;
+  slug(): string;
+  id(): string;
+}
+
 export default class SendToTrelloModal extends Modal {
   states: IState = {
     loading: false,
@@ -33,15 +52,22 @@ export default class SendToTrelloModal extends Modal {
     return app.translator.trans('blomstra-trello.forum.modals.title');
   }
 
+  getTag(id: string): Tag | undefined {
+    return this.tags?.find((tag) => tag.id() === String(id));
+  }
+
   content() {
     return (
       <div class="Modal-body">
         <div class="Form">
           <div class="Form-group">
-            {this.defaultBoardMapping === undefined || this.defaultBoardMapping?.length == 0 ? (
+            {this.tagsWithoutMappings?.length ? (
               <span>
                 <Alert type="warning" dismissible={0}>
-                  {app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}
+                  {app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}:{' '}
+                  {this.tagsWithoutMappings.map((item) => {
+                    return tagLabel(item);
+                  })}
                 </Alert>
               </span>
             ) : (
@@ -131,6 +157,7 @@ export default class SendToTrelloModal extends Modal {
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
     this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
     this.defaultBoardMapping = [];
+    this.tagsWithoutMappings = [];
 
     this.loadData();
   }
@@ -173,7 +200,7 @@ export default class SendToTrelloModal extends Modal {
 
   async loadTrelloLanes(item) {
     this.states.lanes = null;
-
+    this.tagsWithoutMappings = [];
     this.disabled = true;
 
     this.setCurrentSelectedBoard(item);
@@ -195,6 +222,16 @@ export default class SendToTrelloModal extends Modal {
         this.setCurrentSelectedLane({ id: this.states.lanes[0].attributes.id });
       }
     }
+
+    this.tags = this.attrs.discussion.tags();
+    const tagIds = this.defaultBoardMapping.map((item) => {
+      return item.tagId;
+    });
+
+    this.tagsWithoutMappings = this.tags.filter((item) => {
+      return !tagIds.includes(item.data.id);
+    });
+
     this.disabled = false;
 
     m.redraw();

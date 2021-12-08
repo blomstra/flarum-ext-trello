@@ -55,7 +55,7 @@ blomstra-trello:
         board: Select a Trello board
         lane: Select a Trello lane
       no_available_boards_label: No available boards
-      no_mappings_for_board: Current selected board does not have mappings set
+      no_mappings_for_board: Current selected board does not have Trello label mappings set for forum tags
       title: Send to Trello
 
   lib:
