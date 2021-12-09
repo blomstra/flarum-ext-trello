@@ -298,25 +298,24 @@ export default class SendToTrelloModal extends Modal {
 
     this.loading = true;
 
-    // discussion
-    //   .save({
-    //     trello: selected,
-    //   })
-    //   .then(() => {
-    //     if (app.current instanceof DiscussionPage) {
-    //       app.current.stream.update();
-    //     }
-    //
-    //     app.forum.data.attributes.trelloDefaultBoardId = selected.board.short_link;
-    //     app.forum.data.attributes.trelloLastUsedLaneId = selected.lane;
-    //
-    //     m.redraw();
-    //
-    //     this.loading = false;
-    //
-    //     this.hide();
-    //   });
-    console.log(selected);
+    discussion
+      .save({
+        trello: selected,
+      })
+      .then(() => {
+        if (app.current instanceof DiscussionPage) {
+          app.current.stream.update();
+        }
+
+        app.forum.data.attributes.trelloDefaultBoardId = selected.board.short_link;
+        app.forum.data.attributes.trelloLastUsedLaneId = selected.lane;
+
+        m.redraw();
+
+        this.loading = false;
+
+        this.hide();
+      });
   }
 
   className() {
