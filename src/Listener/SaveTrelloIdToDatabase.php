@@ -151,7 +151,7 @@ class SaveTrelloIdToDatabase
 
         if ($client) {
             foreach ($members as $memberId) {
-                $member = (new Member($this->client))->setId($memberId)->get();
+                $member = (new Member($client))->setId($memberId)->get();
 
                 $card->addMember($member);
             }
