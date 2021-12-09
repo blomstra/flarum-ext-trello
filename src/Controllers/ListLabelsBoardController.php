@@ -35,9 +35,15 @@ class ListLabelsBoardController extends AbstractListController
      */
     public $serializer = TrelloLabelSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    /**
+     * @var Client
+     */
+    protected $client;
+
+    public function __construct(SettingsRepositoryInterface $settings, Client $client)
     {
         $this->settings = $settings;
+        $this->client = $client;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
@@ -51,14 +57,7 @@ class ListLabelsBoardController extends AbstractListController
         try {
             $board = Arr::get($request->getQueryParams(), 'board');
 
-            $apiKey = $this->settings->get('blomstra-trello.api_key');
-            $apiToken = $this->settings->get('blomstra-trello.api_token');
-
-            $client = new Client($apiKey);
-
-            $client->setAccessToken($apiToken);
-
-            $board = (new Board($client))->setId($board)->get();
+            $board = (new Board($this->client))->setId($board)->get();
 
             return $board->getLabels();
         } catch (Exception $e) {

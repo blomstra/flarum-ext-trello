@@ -16,6 +16,7 @@ use Blomstra\Trello\Controllers\DeleteBoardController;
 use Blomstra\Trello\Controllers\ListBoardsController;
 use Blomstra\Trello\Controllers\ListLabelsBoardController;
 use Blomstra\Trello\Controllers\ListLanesBoardController;
+use Blomstra\Trello\Providers\TrelloServiceProvider;
 use Flarum\Api\Serializer\DiscussionSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Discussion\Discussion;
@@ -53,4 +54,7 @@ return [
 
     (new Extend\Event())
         ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class),
+
+    (new Extend\ServiceProvider())
+        ->register(TrelloServiceProvider::class),
 ];

@@ -1,0 +1,43 @@
+<?php
+
+namespace Blomstra\Trello\Providers;
+
+use Blomstra\Trello\ValidateTrelloSettings;
+use Flarum\Foundation\AbstractServiceProvider;
+use Flarum\Settings\SettingsRepositoryInterface;
+use Illuminate\Contracts\Container\Container;
+use Trello\Client;
+
+class TrelloServiceProvider extends AbstractServiceProvider
+{
+    /**
+     * @var SettingsRepositoryInterface
+     */
+    protected $settings;
+
+    /**
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        parent::__construct($container);
+    }
+
+    public function register()
+    {
+        $this->container->singleton('blomstra.trello.client', function ($container) {
+            $settings = $container->make(SettingsRepositoryInterface::class);
+
+            if (!ValidateTrelloSettings::Settings($settings)) {
+                return null;
+            }
+
+            $apiKey = $settings->get('blomstra-trello.api_key');
+            $apiToken = $settings->get('blomstra-trello.api_token');
+
+            return (new Client($apiKey))->setAccessToken($apiToken);
+        });
+
+        $this->container->alias('blomstra.trello.client', Client::class);
+    }
+}
