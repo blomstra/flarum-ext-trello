@@ -42,21 +42,15 @@ class ListBoardsController extends AbstractShowController
     protected $translator;
 
     /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * {@inheritdoc}
      */
     public $serializer = TrelloBoardSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, LoggerInterface $logger, Client $client)
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, LoggerInterface $logger)
     {
         $this->settings = $settings;
         $this->translator = $translator;
         $this->logger = $logger;
-        $this->client = $client;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
@@ -72,7 +66,9 @@ class ListBoardsController extends AbstractShowController
         try {
             $memberId = $this->settings->get('blomstra-trello.member_id');
 
-            $member = new Member($this->client);
+            $client = resolve(Client::class);
+
+            $member = new Member($client);
             $member->setId($memberId);
 
             $organizations = collect($member->getOrganizations())->pluck('displayName', 'id')->toArray();

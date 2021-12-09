@@ -31,19 +31,13 @@ class ListLanesBoardController extends AbstractListController
     protected $settings;
 
     /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * {@inheritdoc}
      */
     public $serializer = TrelloLaneSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings, Client $client)
+    public function __construct(SettingsRepositoryInterface $settings)
     {
         $this->settings = $settings;
-        $this->client = $client;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
@@ -57,7 +51,9 @@ class ListLanesBoardController extends AbstractListController
         try {
             $board = Arr::get($request->getQueryParams(), 'board');
 
-            $board = (new Board($this->client))->setId($board)->get();
+            $client = resolve(Client::class);
+
+            $board = (new Board($client))->setId($board)->get();
 
             return $board->getLists();
         } catch (Exception $e) {

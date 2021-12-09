@@ -39,17 +39,11 @@ class SaveTrelloIdToDatabase
      */
     protected $url;
 
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, UrlGenerator $url, Client $client)
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, UrlGenerator $url)
     {
         $this->settings = $settings;
         $this->translator = $translator;
         $this->url = $url;
-        $this->client = $client;
     }
 
     public function handle(Saving $event)
@@ -75,8 +69,10 @@ class SaveTrelloIdToDatabase
 
     private function createTrelloCard(Discussion $discussion, string $trelloLane): ?Card
     {
-        if ($this->client) {
-            $card = new Card($this->client);
+        $client = resolve(Client::class);
+
+        if ($client) {
+            $card = new Card($client);
             $card->name = $discussion->title;
             $card->desc = $this->prefixContentWithUrl($discussion);
             $card->idList = $trelloLane;
@@ -119,8 +115,10 @@ class SaveTrelloIdToDatabase
 
     private function attachLabelsToCardBasedOnForumTags(Discussion $discussion, Card $card, string $shortLink)
     {
-        if ($this->client) {
-            $board = (new Board($this->client))->setId($shortLink)->get();
+        $client = resolve(Client::class);
+
+        if ($client) {
+            $board = (new Board($client))->setId($shortLink)->get();
 
             if ($board) {
                 $mappings = json_decode($this->settings->get('blomstra-trello.label-tag-mappings'), true);
@@ -128,12 +126,12 @@ class SaveTrelloIdToDatabase
                 $boardMappings = Arr::get($mappings, $shortLink);
 
                 if ($boardMappings) {
-                    $discussion->tags->each(function ($tag) use ($boardMappings, $card) {
+                    $discussion->tags->each(function ($tag) use ($client, $boardMappings, $card) {
                         foreach ($boardMappings as $boardMapping) {
                             if ($boardMapping['tagId'] == $tag->id) {
                                 $labelId = data_get($boardMapping, 'label.id');
 
-                                $label = new Label($this->client);
+                                $label = new Label($client);
                                 $label = $label->setId($labelId)->get();
 
                                 $card->addLabel($label);
