@@ -164,7 +164,9 @@ export default class SendToTrelloModal extends Modal {
                 items={this.states.members.map((item) => {
                   return { key: item.attributes.id, label: item.attributes.fullName, value: item.attributes.id };
                 })}
-                onchange={console.log}
+                onchange={(members: any[]) => {
+                  this.setCurrentSelectedMembers(members);
+                }}
               />
             ) : (
               <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_board_members')}</p>
@@ -229,10 +231,8 @@ export default class SendToTrelloModal extends Modal {
     this.selected.lane = item.id;
   }
 
-  setCurrentSelectedMembers(item) {
-    if (!this.selected.members.includes(item.id)) {
-      this.selected.members.push(item.id);
-    }
+  setCurrentSelectedMembers(items) {
+    this.selected.members = items;
   }
 
   async loadTrelloLanes(item) {
