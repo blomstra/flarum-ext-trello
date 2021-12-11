@@ -158,9 +158,12 @@ export default class SendToTrelloModal extends Modal {
             <label>{app.translator.trans('blomstra-trello.forum.modals.fields.member')}</label>
             {this.states.members ? (
               <MultiDropdown
-                label={app.translator.trans('blomstra-trello.forum.modals.fields.member')}
+                label={
+                  this.selected.members.length
+                    ? app.translator.trans('blomstra-trello.forum.modals.fields.member_selected', { count: this.selected.members.length })
+                    : app.translator.trans('blomstra-trello.forum.modals.fields.member')
+                }
                 buttonClassName="Button"
-                updateOnClose
                 items={this.states.members.map((item) => {
                   return { key: item.attributes.id, label: item.attributes.fullName, value: item.attributes.id };
                 })}

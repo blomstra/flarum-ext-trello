@@ -55,6 +55,7 @@ blomstra-trello:
         board: Select a Trello board
         lane: Select a Trello lane
         member: Select a Trello member
+        member_selected: "{count, plural, one {# member}, other {# members}} selected"
       no_available_board_lanes: No available board lanes
       no_available_board_members: No available board members
       no_available_boards_label: No available boards
