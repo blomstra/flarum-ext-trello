@@ -180,8 +180,6 @@ export default class SendToTrelloModal extends Modal {
       members: [],
     };
 
-    console.log(this.selected);
-
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
     this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
     this.defaultBoardMapping = [];
@@ -283,9 +281,6 @@ export default class SendToTrelloModal extends Modal {
 
     const data = response.data;
     this.states.members = data;
-    // if (this.states.members?.length) {
-    //   this.setCurrentSelectedMembers({ id: this.states.members[0].attributes.id });
-    // }
 
     m.redraw();
   }
