@@ -48,6 +48,11 @@ export interface Tag {
   id(): string;
 }
 
+interface ISelected {
+  board: string | null;
+  lane: string | null;
+  members: string[];
+}
 export default class SendToTrelloModal extends Modal {
   states: IState = {
     loading: false,
@@ -55,6 +60,12 @@ export default class SendToTrelloModal extends Modal {
     lanes: null,
     members: null,
     mappings: {},
+  };
+
+  selected: ISelected = {
+    board: null,
+    lane: null,
+    members: [],
   };
 
   title() {
@@ -173,12 +184,6 @@ export default class SendToTrelloModal extends Modal {
     super.oninit(vnode);
 
     this.disabled = true;
-
-    this.selected = {
-      board: null,
-      lane: null,
-      members: [],
-    };
 
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
     this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
