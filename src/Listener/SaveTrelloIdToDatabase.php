@@ -17,7 +17,7 @@ use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Trello\Client;
+use Trello\Client as TrelloClient;
 use Trello\Models\Board;
 use Trello\Models\Card;
 use Trello\Models\Label;
@@ -39,11 +39,17 @@ class SaveTrelloIdToDatabase
      */
     protected $url;
 
-    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, UrlGenerator $url)
+    /**
+     * @var TrelloClient
+     */
+    protected $client;
+
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, UrlGenerator $url, TrelloClient $client)
     {
         $this->settings = $settings;
         $this->translator = $translator;
         $this->url = $url;
+        $this->client = $client;
     }
 
     public function handle(Saving $event)
@@ -69,10 +75,8 @@ class SaveTrelloIdToDatabase
 
     private function createTrelloCard(Discussion $discussion, string $trelloLane): ?Card
     {
-        $client = resolve(Client::class);
-
-        if ($client) {
-            $card = new Card($client);
+        if ($this->client) {
+            $card = new Card($this->client);
             $card->name = $discussion->title;
             $card->desc = $this->prefixContentWithUrl($discussion);
             $card->idList = $trelloLane;
@@ -115,10 +119,8 @@ class SaveTrelloIdToDatabase
 
     private function attachLabelsToCardBasedOnForumTags(Discussion $discussion, Card $card, string $shortLink)
     {
-        $client = resolve(Client::class);
-
-        if ($client) {
-            $board = (new Board($client))->setId($shortLink)->get();
+        if ($this->client) {
+            $board = (new Board($this->client))->setId($shortLink)->get();
 
             if ($board) {
                 $mappings = json_decode($this->settings->get('blomstra-trello.label-tag-mappings'), true);
@@ -126,12 +128,12 @@ class SaveTrelloIdToDatabase
                 $boardMappings = Arr::get($mappings, $shortLink);
 
                 if ($boardMappings) {
-                    $discussion->tags->each(function ($tag) use ($client, $boardMappings, $card) {
+                    $discussion->tags->each(function ($tag) use ($boardMappings, $card) {
                         foreach ($boardMappings as $boardMapping) {
                             if ($boardMapping['tagId'] == $tag->id) {
                                 $labelId = data_get($boardMapping, 'label.id');
 
-                                $label = new Label($client);
+                                $label = new Label($this->client);
                                 $label = $label->setId($labelId)->get();
 
                                 $card->addLabel($label);

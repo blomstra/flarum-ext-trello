@@ -21,7 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Tobscure\JsonApi\Document;
-use Trello\Client;
+use Trello\Client as TrelloClient;
 use Trello\Models\Member;
 
 class ListBoardsController extends AbstractShowController
@@ -42,15 +42,21 @@ class ListBoardsController extends AbstractShowController
     protected $translator;
 
     /**
+     * @var TrelloClient
+     */
+    protected $client;
+
+    /**
      * {@inheritdoc}
      */
     public $serializer = TrelloBoardSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, LoggerInterface $logger)
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, LoggerInterface $logger, TrelloClient $client)
     {
         $this->settings = $settings;
         $this->translator = $translator;
         $this->logger = $logger;
+        $this->client = $client;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
@@ -66,9 +72,7 @@ class ListBoardsController extends AbstractShowController
         try {
             $memberId = $this->settings->get('blomstra-trello.member_id');
 
-            $client = resolve(Client::class);
-
-            $member = new Member($client);
+            $member = new Member($this->client);
             $member->setId($memberId);
 
             $organizations = collect($member->getOrganizations())->pluck('displayName', 'id')->toArray();

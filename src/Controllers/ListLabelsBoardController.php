@@ -20,7 +20,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use Trello\Client;
+use Trello\Client as TrelloClient;
 use Trello\Models\Board;
 
 class ListLabelsBoardController extends AbstractListController
@@ -31,13 +31,19 @@ class ListLabelsBoardController extends AbstractListController
     protected $settings;
 
     /**
+     * @var TrelloClient
+     */
+    protected $client;
+
+    /**
      * {@inheritdoc}
      */
     public $serializer = TrelloLabelSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    public function __construct(SettingsRepositoryInterface $settings, TrelloClient $client)
     {
         $this->settings = $settings;
+        $this->client = $client;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
@@ -51,9 +57,7 @@ class ListLabelsBoardController extends AbstractListController
         try {
             $board = Arr::get($request->getQueryParams(), 'board');
 
-            $client = resolve(Client::class);
-
-            $board = (new Board($client))->setId($board)->get();
+            $board = (new Board($this->client))->setId($board)->get();
 
             return $board->getLabels();
         } catch (Exception $e) {
