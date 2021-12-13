@@ -12,7 +12,6 @@
 namespace Blomstra\Trello\Controllers;
 
 use Blomstra\Trello\Serializer\TrelloBoardSerializer;
-use Blomstra\Trello\ValidateTrelloSettings;
 use Exception;
 use Flarum\Api\Controller\AbstractShowController;
 use Flarum\Http\RequestUtil;
