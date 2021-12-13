@@ -12,11 +12,9 @@
 namespace Blomstra\Trello\Controllers;
 
 use Blomstra\Trello\Serializer\TrelloLaneSerializer;
-use Blomstra\Trello\ValidateTrelloSettings;
 use Exception;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
-use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
@@ -25,11 +23,6 @@ use Trello\Models\Board;
 
 class ListLanesBoardController extends AbstractListController
 {
-    /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
     /**
      * @var TrelloClient
      */
@@ -40,9 +33,8 @@ class ListLanesBoardController extends AbstractListController
      */
     public $serializer = TrelloLaneSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings, TrelloClient $client)
+    public function __construct(TrelloClient $client)
     {
-        $this->settings = $settings;
         $this->client = $client;
     }
 
@@ -50,7 +42,7 @@ class ListLanesBoardController extends AbstractListController
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        if (!ValidateTrelloSettings::Settings($this->settings)) {
+        if (!$this->client) {
             return [];
         }
 

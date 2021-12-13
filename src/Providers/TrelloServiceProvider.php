@@ -15,7 +15,7 @@ use Blomstra\Trello\ValidateTrelloSettings;
 use Flarum\Foundation\AbstractServiceProvider;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Container\Container;
-use Trello\Client;
+use Trello\Client as TrelloClient;
 
 class TrelloServiceProvider extends AbstractServiceProvider
 {
@@ -44,9 +44,9 @@ class TrelloServiceProvider extends AbstractServiceProvider
             $apiKey = $settings->get('blomstra-trello.api_key');
             $apiToken = $settings->get('blomstra-trello.api_token');
 
-            return (new Client($apiKey))->setAccessToken($apiToken);
+            return (new TrelloClient($apiKey))->setAccessToken($apiToken);
         });
 
-        $this->container->alias('blomstra.trello.client', Client::class);
+        $this->container->alias('blomstra.trello.client', TrelloClient::class);
     }
 }

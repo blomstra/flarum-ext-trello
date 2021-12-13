@@ -63,7 +63,7 @@ class ListBoardsController extends AbstractShowController
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        if (!ValidateTrelloSettings::Settings($this->settings)) {
+        if (!$this->client) {
             return [];
         }
 
