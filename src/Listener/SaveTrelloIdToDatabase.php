@@ -11,15 +11,13 @@
 
 namespace Blomstra\Trello\Listener;
 
-use Blomstra\Trello\ValidateTrelloSettings;
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Saving;
 use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\Tags\Tag;
 use Illuminate\Support\Arr;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Trello\Client;
+use Trello\Client as TrelloClient;
 use Trello\Models\Board;
 use Trello\Models\Card;
 use Trello\Models\Label;
@@ -41,11 +39,17 @@ class SaveTrelloIdToDatabase
      */
     protected $url;
 
-    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, UrlGenerator $url)
+    /**
+     * @var TrelloClient
+     */
+    protected $client;
+
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, UrlGenerator $url, TrelloClient $client)
     {
         $this->settings = $settings;
         $this->translator = $translator;
         $this->url = $url;
+        $this->client = $client;
     }
 
     public function handle(Saving $event)
@@ -71,10 +75,8 @@ class SaveTrelloIdToDatabase
 
     private function createTrelloCard(Discussion $discussion, string $trelloLane): ?Card
     {
-        $client = $this->createTrelloApiClient();
-
-        if ($client) {
-            $card = new Card($client);
+        if ($this->client) {
+            $card = new Card($this->client);
             $card->name = $discussion->title;
             $card->desc = $this->prefixContentWithUrl($discussion);
             $card->idList = $trelloLane;
@@ -117,62 +119,29 @@ class SaveTrelloIdToDatabase
 
     private function attachLabelsToCardBasedOnForumTags(Discussion $discussion, Card $card, string $shortLink)
     {
-        if ($client = $this->createTrelloApiClient()) {
-            $board = (new Board($client))->setId($shortLink)->get();
+        if ($this->client) {
+            $board = (new Board($this->client))->setId($shortLink)->get();
 
             if ($board) {
-                $labels = collect($board->getLabels());
+                $mappings = json_decode($this->settings->get('blomstra-trello.label-tag-mappings'), true);
 
-                $includeSecondaryTags = (bool) $this->settings->get('blomstra-trello.include_secondary_tags_as_trello_labels', false);
+                $boardMappings = Arr::get($mappings, $shortLink);
 
-                $discussion->tags->filter(function ($tag) use ($includeSecondaryTags) {
-                    return $includeSecondaryTags ?: !is_null($tag->position);
-                })->each(function ($tag) use ($labels, $board, $card) {
-                    $label = $labels->filter(function ($label) use ($tag) {
-                        return $label->name == $tag->name;
-                    })->first();
+                if ($boardMappings) {
+                    $discussion->tags->each(function ($tag) use ($boardMappings, $card) {
+                        foreach ($boardMappings as $boardMapping) {
+                            if ($boardMapping['tagId'] == $tag->id) {
+                                $labelId = data_get($boardMapping, 'label.id');
 
-                    if (!$label) {
-                        $label = $labels->filter(function ($label) {
-                            return $label->name == '';
-                        })->first();
+                                $label = new Label($this->client);
+                                $label = $label->setId($labelId)->get();
 
-                        $label = $this->updateOrCreateLabel($label, $board, $tag);
-                    }
-
-                    $card->addLabel($label);
-                });
+                                $card->addLabel($label);
+                            }
+                        }
+                    });
+                }
             }
         }
-    }
-
-    private function updateOrCreateLabel(?Label $label, Board $board, Tag $tag)
-    {
-        if (!$label) {
-            $client = $this->createTrelloApiClient();
-
-            $label = new Label($client);
-            $label->idBoard = $board->getId();
-        }
-
-        $label->name = $tag->name;
-
-        return $label->save();
-    }
-
-    private function createTrelloApiClient(): ?Client
-    {
-        if (!ValidateTrelloSettings::Settings($this->settings)) {
-            return null;
-        }
-
-        $apiKey = $this->settings->get('blomstra-trello.api_key');
-        $apiToken = $this->settings->get('blomstra-trello.api_token');
-
-        $client = new Client($apiKey);
-
-        $client->setAccessToken($apiToken);
-
-        return $client;
     }
 }

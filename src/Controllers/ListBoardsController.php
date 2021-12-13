@@ -12,7 +12,6 @@
 namespace Blomstra\Trello\Controllers;
 
 use Blomstra\Trello\Serializer\TrelloBoardSerializer;
-use Blomstra\Trello\ValidateTrelloSettings;
 use Exception;
 use Flarum\Api\Controller\AbstractShowController;
 use Flarum\Http\RequestUtil;
@@ -21,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Tobscure\JsonApi\Document;
-use Trello\Client;
+use Trello\Client as TrelloClient;
 use Trello\Models\Member;
 
 class ListBoardsController extends AbstractShowController
@@ -42,37 +41,37 @@ class ListBoardsController extends AbstractShowController
     protected $translator;
 
     /**
+     * @var TrelloClient
+     */
+    protected $client;
+
+    /**
      * {@inheritdoc}
      */
     public $serializer = TrelloBoardSerializer::class;
 
-    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, LoggerInterface $logger)
+    public function __construct(SettingsRepositoryInterface $settings, TranslatorInterface $translator, LoggerInterface $logger, TrelloClient $client)
     {
         $this->settings = $settings;
         $this->translator = $translator;
         $this->logger = $logger;
+        $this->client = $client;
     }
 
     protected function data(ServerRequestInterface $request, Document $document)
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        if (!ValidateTrelloSettings::Settings($this->settings)) {
+        if (!$this->client) {
             return [];
         }
 
         $selection = [];
 
         try {
-            $apiKey = $this->settings->get('blomstra-trello.api_key');
-            $apiToken = $this->settings->get('blomstra-trello.api_token');
             $memberId = $this->settings->get('blomstra-trello.member_id');
 
-            $client = new Client($apiKey);
-
-            $client->setAccessToken($apiToken);
-
-            $member = new Member($client);
+            $member = new Member($this->client);
             $member->setId($memberId);
 
             $organizations = collect($member->getOrganizations())->pluck('displayName', 'id')->toArray();

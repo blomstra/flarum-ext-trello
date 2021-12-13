@@ -14,7 +14,9 @@ namespace Blomstra\Trello;
 use Blomstra\Trello\Controllers\AddBoardController;
 use Blomstra\Trello\Controllers\DeleteBoardController;
 use Blomstra\Trello\Controllers\ListBoardsController;
+use Blomstra\Trello\Controllers\ListLabelsBoardController;
 use Blomstra\Trello\Controllers\ListLanesBoardController;
+use Blomstra\Trello\Providers\TrelloServiceProvider;
 use Flarum\Api\Serializer\DiscussionSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Discussion\Discussion;
@@ -35,6 +37,7 @@ return [
     (new Extend\Routes('api'))
         ->get('/blomstra/trello/api-boards', 'blomstra::trello.boards-api.index', ListBoardsController::class)
         ->get('/blomstra/trello/api-boards/{board}/lanes', 'blomstra::trello.boards-api.lanes.index', ListLanesBoardController::class)
+        ->get('/blomstra/trello/api-boards/{board}/labels', 'blomstra::trello.boards-api.labels.index', ListLabelsBoardController::class)
         ->post('/blomstra/trello/boards', 'blomstra::trello.boards.store', AddBoardController::class)
         ->delete('/blomstra/trello/boards/{shortLink}', 'blomstra::trello.boards.destroy', DeleteBoardController::class),
 
@@ -51,4 +54,7 @@ return [
 
     (new Extend\Event())
         ->listen(Saving::class, Listener\SaveTrelloIdToDatabase::class),
+
+    (new Extend\ServiceProvider())
+        ->register(TrelloServiceProvider::class),
 ];

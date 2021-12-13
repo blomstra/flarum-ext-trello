@@ -15,26 +15,15 @@ use Blomstra\Trello\Models\TrelloBoard;
 use Blomstra\Trello\Serializer\DatabaseBoardSerializer;
 use Flarum\Api\Controller\AbstractCreateController;
 use Flarum\Http\RequestUtil;
-use Flarum\Settings\SettingsRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 
 class AddBoardController extends AbstractCreateController
 {
     /**
-     * @var SettingsRepositoryInterface
-     */
-    protected $settings;
-
-    /**
      * {@inheritdoc}
      */
     public $serializer = DatabaseBoardSerializer::class;
-
-    public function __construct(SettingsRepositoryInterface $settings)
-    {
-        $this->settings = $settings;
-    }
 
     protected function data(ServerRequestInterface $request, Document $document)
     {

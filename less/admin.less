@@ -7,4 +7,41 @@
   .TrelloSettings-availableBoards {
     display: block;
   }
+  &-mappings {
+    padding: 16px;
+    border: 1px solid @control-bg;
+    border-radius: 8px;
+    margin-bottom: 16px;
+
+    width: max-content;
+
+    display: flex;
+    grid-template-columns: auto auto auto 1fr auto;
+
+    align-items: flex-start;
+    justify-items: flex-end;
+    flex-direction: column;
+
+    .Placeholder {
+      grid-column: ~"1 / 6";
+
+      &,
+      p {
+        margin: 0;
+      }
+    }
+  }
+
+  &-NewTagMappingModal {
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+      margin-top: 8px;
+    }
+
+    button {
+      margin-top: 8px;
+    }
+  }
 }

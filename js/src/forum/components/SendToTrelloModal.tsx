@@ -1,8 +1,10 @@
 import app from 'flarum/forum/app';
 import icon from 'flarum/common/helpers/icon';
+import Alert from 'flarum/common/components/Alert';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
+import tagLabel from 'flarum/tags/helpers/tagLabel';
 
 export interface DatabaseBoard {
   name: string;
@@ -17,6 +19,25 @@ interface IState {
   loading: boolean;
   boards: DatabaseBoard[] | null;
   lanes: BoardLane[] | null;
+  mappings: {};
+}
+
+export interface Tag {
+  backgroundMode(): string;
+  backgroundUrl(): string;
+  // children():
+  color(): string;
+  discussionCount(): number;
+  icon(): string;
+  isChild(): boolean;
+  isHidden(): boolean;
+  isPrimary(): boolean;
+  name(): string;
+  description(): string;
+  // parent():
+  position(): number;
+  slug(): string;
+  id(): string;
 }
 
 export default class SendToTrelloModal extends Modal {
@@ -24,10 +45,15 @@ export default class SendToTrelloModal extends Modal {
     loading: false,
     boards: null,
     lanes: null,
+    mappings: {},
   };
 
   title() {
     return app.translator.trans('blomstra-trello.forum.modals.title');
+  }
+
+  getTag(id: string): Tag | undefined {
+    return this.tags?.find((tag) => tag.id() === String(id));
   }
 
   content() {
@@ -35,31 +61,47 @@ export default class SendToTrelloModal extends Modal {
       <div class="Modal-body">
         <div class="Form">
           <div class="Form-group">
+            {this.tagsWithoutMappings?.length ? (
+              <span>
+                <Alert type="warning" dismissible={0}>
+                  {app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}:{' '}
+                  {this.tagsWithoutMappings.map((item) => {
+                    return tagLabel(item);
+                  })}
+                </Alert>
+              </span>
+            ) : (
+              ''
+            )}
+          </div>
+          <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.forum.modals.fields.board')}</label>
             {this.states.boards ? (
-              <span class="Select">
-                <select
-                  class="Select-input FormControl"
-                  onchange={(e: InputEvent) => {
-                    const target = e.currentTarget as HTMLSelectElement;
-                    this.loadTrelloLanes({
-                      short_link: target.value,
-                      text: target.selectedOptions[0].textContent,
-                    });
-                  }}
-                >
-                  {this.states.boards.map((item) => {
-                    return this.defaultBoardId == item.short_link ? (
-                      <option selected value={item.short_link}>
-                        {item.name}
-                      </option>
-                    ) : (
-                      <option value={item.short_link}>{item.name}</option>
-                    );
-                  })}
-                </select>
-                {icon('fas fa-sort Select-caret')}
-              </span>
+              <>
+                <span class="Select">
+                  <select
+                    class="Select-input FormControl"
+                    onchange={(e: InputEvent) => {
+                      const target = e.currentTarget as HTMLSelectElement;
+                      this.loadTrelloLanes({
+                        short_link: target.value,
+                        text: target.selectedOptions[0].textContent,
+                      });
+                    }}
+                  >
+                    {this.states.boards?.map((item) => {
+                      return this.defaultBoardId == item.short_link ? (
+                        <option selected value={item.short_link}>
+                          {item.name}
+                        </option>
+                      ) : (
+                        <option value={item.short_link}>{item.name}</option>
+                      );
+                    })}
+                  </select>
+                  {icon('fas fa-sort Select-caret')}
+                </span>
+              </>
             ) : (
               <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_boards_label')}</p>
             )}
@@ -114,6 +156,8 @@ export default class SendToTrelloModal extends Modal {
 
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
     this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
+    this.defaultBoardMapping = [];
+    this.tagsWithoutMappings = [];
 
     this.loadData();
   }
@@ -122,6 +166,8 @@ export default class SendToTrelloModal extends Modal {
     this.loading = true;
 
     this.states.boards = app.forum.attribute('trelloBoards');
+
+    this.loadMappings();
 
     if (this.states.boards.length) {
       const item = {
@@ -144,6 +190,8 @@ export default class SendToTrelloModal extends Modal {
     };
 
     this.defaultBoardId = item.short_link;
+
+    this.defaultBoardMapping = this.states.mappings[item.short_link];
   }
 
   setCurrentSelectedLane(item) {
@@ -152,7 +200,7 @@ export default class SendToTrelloModal extends Modal {
 
   async loadTrelloLanes(item) {
     this.states.lanes = null;
-
+    this.tagsWithoutMappings = [];
     this.disabled = true;
 
     this.setCurrentSelectedBoard(item);
@@ -166,15 +214,24 @@ export default class SendToTrelloModal extends Modal {
     const data = response.data;
     this.states.lanes = data;
     if (this.states.lanes.length) {
-
       const laneExists = this.states.lanes?.some?.((item) => item.id === this.defaultLaneId);
 
       if (laneExists) {
         this.setCurrentSelectedLane({ id: this.defaultLaneId });
       } else {
-        this.setCurrentSelectedLane({ id: this.states.lanes[0].attributes.id})
+        this.setCurrentSelectedLane({ id: this.states.lanes[0].attributes.id });
       }
     }
+
+    this.tags = this.attrs.discussion.tags();
+    const tagIds = this.defaultBoardMapping.map((item) => {
+      return item.tagId;
+    });
+
+    this.tagsWithoutMappings = this.tags.filter((item) => {
+      return !tagIds.includes(item.data.id);
+    });
+
     this.disabled = false;
 
     m.redraw();
@@ -208,6 +265,16 @@ export default class SendToTrelloModal extends Modal {
   }
 
   className() {
-    return 'Modal--small blomstra-trello-modal';
+    return 'Modal--small Blomstra-Trello-modal';
+  }
+
+  private loadMappings() {
+    try {
+      this.states.mappings = JSON.parse(app.forum.attribute('trelloLabelTagMappings'));
+      this.defaultBoardMapping = this.states.mappings[this.defaultBoardId];
+    } catch {
+      this.states.mappings = {};
+      this.defaultBoardMapping = [];
+    }
   }
 }

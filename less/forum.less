@@ -1,0 +1,18 @@
+.Blomstra-Trello-modal{
+  .TagLabel {
+    & when (@config-dark-mode = false) {
+      color: #000;
+    }
+    & when (@config-dark-mode = true) {
+      color: #fff;
+    }
+  }
+  .TagLabel.colored .TagLabel-text {
+    & when (@config-dark-mode = false) {
+      color: #000;
+    }
+    & when (@config-dark-mode = true) {
+      color: #fff !important;
+    }
+  }
+}

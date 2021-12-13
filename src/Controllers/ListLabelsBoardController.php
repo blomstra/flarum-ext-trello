@@ -11,7 +11,7 @@
 
 namespace Blomstra\Trello\Controllers;
 
-use Blomstra\Trello\Serializer\TrelloLaneSerializer;
+use Blomstra\Trello\Serializer\TrelloLabelSerializer;
 use Exception;
 use Flarum\Api\Controller\AbstractListController;
 use Flarum\Http\RequestUtil;
@@ -21,7 +21,7 @@ use Tobscure\JsonApi\Document;
 use Trello\Client as TrelloClient;
 use Trello\Models\Board;
 
-class ListLanesBoardController extends AbstractListController
+class ListLabelsBoardController extends AbstractListController
 {
     /**
      * @var TrelloClient
@@ -31,7 +31,7 @@ class ListLanesBoardController extends AbstractListController
     /**
      * {@inheritdoc}
      */
-    public $serializer = TrelloLaneSerializer::class;
+    public $serializer = TrelloLabelSerializer::class;
 
     public function __construct(TrelloClient $client)
     {
@@ -51,7 +51,7 @@ class ListLanesBoardController extends AbstractListController
 
             $board = (new Board($this->client))->setId($board)->get();
 
-            return $board->getLists();
+            return $board->getLabels();
         } catch (Exception $e) {
         }
 
