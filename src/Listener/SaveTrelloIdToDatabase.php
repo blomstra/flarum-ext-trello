@@ -149,11 +149,9 @@ class SaveTrelloIdToDatabase
 
     private function attachMembersToCard(Card $card, $members)
     {
-        $client = resolve(Client::class);
-
-        if ($client) {
+        if ($this->client) {
             foreach ($members as $memberId) {
-                $member = (new Member($client))->setId($memberId)->get();
+                $member = (new Member($this->client))->setId($memberId)->get();
 
                 $card->addMember($member);
             }
