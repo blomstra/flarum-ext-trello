@@ -265,9 +265,11 @@ export default class SendToTrelloModal extends Modal {
     }
 
     this.tags = this.attrs.discussion.tags();
-    const tagIds = this.defaultBoardMapping.map((item) => {
-      return item.tagId;
-    });
+    const tagIds = this.defaultBoardMapping
+      ? this.defaultBoardMapping.map((item) => {
+          return item.tagId;
+        })
+      : [];
 
     this.tagsWithoutMappings = this.tags.filter((item) => {
       return !tagIds.includes(item.data.id);
