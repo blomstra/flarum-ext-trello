@@ -13,9 +13,10 @@ namespace Blomstra\Trello;
 
 use Blomstra\Trello\Controllers\AddBoardController;
 use Blomstra\Trello\Controllers\DeleteBoardController;
+use Blomstra\Trello\Controllers\ListBoardLabelsController;
+use Blomstra\Trello\Controllers\ListBoardLanesController;
+use Blomstra\Trello\Controllers\ListBoardMembersController;
 use Blomstra\Trello\Controllers\ListBoardsController;
-use Blomstra\Trello\Controllers\ListLabelsBoardController;
-use Blomstra\Trello\Controllers\ListLanesBoardController;
 use Blomstra\Trello\Providers\TrelloServiceProvider;
 use Flarum\Api\Serializer\DiscussionSerializer;
 use Flarum\Api\Serializer\ForumSerializer;
@@ -36,8 +37,9 @@ return [
 
     (new Extend\Routes('api'))
         ->get('/blomstra/trello/api-boards', 'blomstra::trello.boards-api.index', ListBoardsController::class)
-        ->get('/blomstra/trello/api-boards/{board}/lanes', 'blomstra::trello.boards-api.lanes.index', ListLanesBoardController::class)
-        ->get('/blomstra/trello/api-boards/{board}/labels', 'blomstra::trello.boards-api.labels.index', ListLabelsBoardController::class)
+        ->get('/blomstra/trello/api-boards/{board}/lanes', 'blomstra::trello.boards-api.lanes.index', ListBoardLanesController::class)
+        ->get('/blomstra/trello/api-boards/{board}/labels', 'blomstra::trello.boards-api.labels.index', ListBoardLabelsController::class)
+        ->get('/blomstra/trello/api-boards/{board}/members', 'blomstra::trello.boards-api.members.index', ListBoardMembersController::class)
         ->post('/blomstra/trello/boards', 'blomstra::trello.boards.store', AddBoardController::class)
         ->delete('/blomstra/trello/boards/{shortLink}', 'blomstra::trello.boards.destroy', DeleteBoardController::class),
 

@@ -21,7 +21,7 @@ use Tobscure\JsonApi\Document;
 use Trello\Client as TrelloClient;
 use Trello\Models\Board;
 
-class ListLabelsBoardController extends AbstractListController
+class ListBoardLabelsController extends AbstractListController
 {
     /**
      * @var TrelloClient

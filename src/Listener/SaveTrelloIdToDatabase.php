@@ -21,6 +21,7 @@ use Trello\Client as TrelloClient;
 use Trello\Models\Board;
 use Trello\Models\Card;
 use Trello\Models\Label;
+use Trello\Models\Member;
 
 class SaveTrelloIdToDatabase
 {
@@ -69,6 +70,7 @@ class SaveTrelloIdToDatabase
                 $this->rememberLastUsedBoardId($attributes['trello']['board']['short_link']);
 
                 $this->attachLabelsToCardBasedOnForumTags($discussion, $card, $attributes['trello']['board']['short_link']);
+                $this->attachMembersToCard($card, $attributes['trello']['members']);
             }
         }
     }
@@ -141,6 +143,17 @@ class SaveTrelloIdToDatabase
                         }
                     });
                 }
+            }
+        }
+    }
+
+    private function attachMembersToCard(Card $card, $members)
+    {
+        if ($this->client) {
+            foreach ($members as $memberId) {
+                $member = (new Member($this->client))->setId($memberId)->get();
+
+                $card->addMember($member);
             }
         }
     }

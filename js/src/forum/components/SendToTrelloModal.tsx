@@ -5,13 +5,20 @@ import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import tagLabel from 'flarum/tags/helpers/tagLabel';
+import MultiDropdown, { IMultiDropdownItem } from '../../common/MultiDropdown';
 
 export interface DatabaseBoard {
   name: string;
   short_link: string;
 }
+
 export interface BoardLane {
   name: string;
+  id: string;
+}
+
+export interface BoardMember {
+  fullName: string;
   id: string;
 }
 
@@ -19,6 +26,7 @@ interface IState {
   loading: boolean;
   boards: DatabaseBoard[] | null;
   lanes: BoardLane[] | null;
+  members: BoardMember[] | null;
   mappings: {};
 }
 
@@ -40,12 +48,24 @@ export interface Tag {
   id(): string;
 }
 
+interface ISelected {
+  board: string | null;
+  lane: string | null;
+  members: string[];
+}
 export default class SendToTrelloModal extends Modal {
   states: IState = {
     loading: false,
     boards: null,
     lanes: null,
+    members: null,
     mappings: {},
+  };
+
+  selected: ISelected = {
+    board: null,
+    lane: null,
+    members: [],
   };
 
   title() {
@@ -131,7 +151,28 @@ export default class SendToTrelloModal extends Modal {
                 {icon('fas fa-sort Select-caret')}
               </span>
             ) : (
-              <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_boards_label')}</p>
+              <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_board_lanes')}</p>
+            )}
+          </div>
+          <div class="Form-group">
+            <label>{app.translator.trans('blomstra-trello.forum.modals.fields.member')}</label>
+            {this.states.members ? (
+              <MultiDropdown
+                label={
+                  this.selected.members.length
+                    ? app.translator.trans('blomstra-trello.forum.modals.fields.member_selected', { count: this.selected.members.length })
+                    : app.translator.trans('blomstra-trello.forum.modals.fields.member')
+                }
+                buttonClassName="Button"
+                items={this.states.members.map((item) => {
+                  return { key: item.attributes.id, label: item.attributes.fullName, value: item.attributes.id };
+                })}
+                onchange={(members: any[]) => {
+                  this.setCurrentSelectedMembers(members);
+                }}
+              />
+            ) : (
+              <p>{app.translator.trans('blomstra-trello.forum.modals.no_available_board_members')}</p>
             )}
           </div>
           <div class="Form-group">
@@ -148,11 +189,6 @@ export default class SendToTrelloModal extends Modal {
     super.oninit(vnode);
 
     this.disabled = true;
-
-    this.selected = {
-      board: null,
-      lane: null,
-    };
 
     this.defaultBoardId = app.forum.attribute('trelloDefaultBoardId');
     this.defaultLaneId = app.forum.attribute('trelloLastUsedLaneId');
@@ -198,9 +234,14 @@ export default class SendToTrelloModal extends Modal {
     this.selected.lane = item.id;
   }
 
+  setCurrentSelectedMembers(items) {
+    this.selected.members = items;
+  }
+
   async loadTrelloLanes(item) {
     this.states.lanes = null;
     this.tagsWithoutMappings = [];
+    this.states.members = null;
     this.disabled = true;
 
     this.setCurrentSelectedBoard(item);
@@ -213,7 +254,7 @@ export default class SendToTrelloModal extends Modal {
 
     const data = response.data;
     this.states.lanes = data;
-    if (this.states.lanes.length) {
+    if (this.states.lanes?.length) {
       const laneExists = this.states.lanes?.some?.((item) => item.id === this.defaultLaneId);
 
       if (laneExists) {
@@ -232,7 +273,22 @@ export default class SendToTrelloModal extends Modal {
       return !tagIds.includes(item.data.id);
     });
 
+    this.loadTrelloMembers();
+
     this.disabled = false;
+
+    m.redraw();
+  }
+
+  async loadTrelloMembers() {
+    // load members based on the currently selected board
+    const response = await app.request({
+      method: 'GET',
+      url: app.forum.attribute('apiUrl') + `/blomstra/trello/api-boards/${this.selected.board.short_link}/members`,
+    });
+
+    const data = response.data;
+    this.states.members = data;
 
     m.redraw();
   }
@@ -256,6 +312,7 @@ export default class SendToTrelloModal extends Modal {
 
         app.forum.data.attributes.trelloDefaultBoardId = selected.board.short_link;
         app.forum.data.attributes.trelloLastUsedLaneId = selected.lane;
+
         m.redraw();
 
         this.loading = false;

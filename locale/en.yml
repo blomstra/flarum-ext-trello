@@ -54,6 +54,10 @@ blomstra-trello:
       fields:
         board: Select a Trello board
         lane: Select a Trello lane
+        member: Select a Trello member
+        member_selected: "{count, plural, one {# member}, other {# members}} selected"
+      no_available_board_lanes: No available board lanes
+      no_available_board_members: No available board members
       no_available_boards_label: No available boards
       no_mappings_for_board: Current selected board does not have Trello label mappings set for forum tags
       title: Send to Trello
