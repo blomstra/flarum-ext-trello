@@ -1,10 +1,8 @@
 import app from 'flarum/forum/app';
 import icon from 'flarum/common/helpers/icon';
-import Alert from 'flarum/common/components/Alert';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
-import tagLabel from 'flarum/tags/helpers/tagLabel';
 import MultiDropdown, { IMultiDropdownItem } from '../../common/MultiDropdown';
 
 export interface DatabaseBoard {
@@ -80,20 +78,6 @@ export default class SendToTrelloModal extends Modal {
     return (
       <div class="Modal-body">
         <div class="Form">
-          <div class="Form-group">
-            {this.tagsWithoutMappings?.length ? (
-              <span>
-                <Alert type="warning" dismissible={0}>
-                  {app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}:{' '}
-                  {this.tagsWithoutMappings.map((item) => {
-                    return tagLabel(item);
-                  })}
-                </Alert>
-              </span>
-            ) : (
-              ''
-            )}
-          </div>
           <div class="Form-group">
             <label>{app.translator.trans('blomstra-trello.forum.modals.fields.board')}</label>
             {this.states.boards ? (
