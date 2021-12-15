@@ -153,6 +153,16 @@ export default class NewTagMappingModal extends Modal {
 
     this.selected.board = param.short_link;
 
+    if (this.states.labels.length) {
+      const firstLabel = this.states.labels[0];
+
+      this.selected.label = {
+        id: firstLabel.id,
+        name: firstLabel.attributes.name || app.translator.trans('blomstra-trello.admin.settings.no_label_name'),
+        color: firstLabel.attributes.color,
+      };
+    }
+
     m.redraw();
   }
 }
