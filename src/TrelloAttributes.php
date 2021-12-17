@@ -34,6 +34,7 @@ class TrelloAttributes
             $attributes['trelloDefaultBoardId'] = $this->settings->get('blomstra-trello.default_board_id');
             $attributes['trelloLastUsedLaneId'] = $this->settings->get('blomstra-trello.last_used_lane_id');
             $attributes['trelloLabelTagMappings'] = $this->settings->get('blomstra-trello.label-tag-mappings');
+            $attributes['trelloUnmappedTagWarning'] = (bool) $this->settings->get('blomstra-trello.unmapped_tag_warning');
         }
 
         return $attributes;
