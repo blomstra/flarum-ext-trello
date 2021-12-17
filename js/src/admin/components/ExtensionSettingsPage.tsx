@@ -342,6 +342,12 @@ export default class TrelloSettingsPage extends ExtensionPage {
           <hr />
           <div class="Form-group">
             <h3>{app.translator.trans('blomstra-trello.admin.settings.label.labels')}</h3>
+            {this.buildSettingComponent({
+              type: 'boolean',
+              setting: 'blomstra-trello.unmapped_tag_warning',
+              label: app.translator.trans('blomstra-trello.admin.settings.unmapped_warning_label'),
+              help: app.translator.trans('blomstra-trello.admin.settings.unmapped_warning_help'),
+            })}
             <label>{app.translator.trans('blomstra-trello.admin.settings.mappings_label')}</label>
             <div class="BlomstraTrello-mappings">
               {this.states.databaseBoards?.map((databaseBoard) => {

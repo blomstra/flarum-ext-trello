@@ -81,7 +81,7 @@ export default class SendToTrelloModal extends Modal {
       <div class="Modal-body">
         <div class="Form">
           <div class="Form-group">
-            {this.tagsWithoutMappings?.length ? (
+            {this.tagsWithoutMappings?.length && app.forum.attribute('trelloUnmappedTagWarning') ? (
               <span>
                 <Alert type="warning" dismissible={0}>
                   {app.translator.trans('blomstra-trello.forum.modals.no_mappings_for_board')}:{' '}

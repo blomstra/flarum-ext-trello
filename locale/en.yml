@@ -42,6 +42,8 @@ blomstra-trello:
       selected_boards_label: Selected boards
       save: Save changes
       tag: Tag
+      unmapped_warning_label: Warn about unmapped tags
+      unmapped_warning_help: Display a warning when sending a discussion to Trello if the Forum tags are not mapped to Trello tags
 
   forum:
     badges:
