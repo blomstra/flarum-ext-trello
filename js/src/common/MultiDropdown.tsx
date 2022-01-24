@@ -2,8 +2,11 @@ import Dropdown from 'flarum/common/components/Dropdown';
 import classList from 'flarum/common/utils/classList';
 import { IButtonAttrs, default as Button } from 'flarum/common/components/Button';
 import type Mithril from 'mithril';
+import Separator from 'flarum/common/components/Separator';
 
-export interface IMultiDropdownItem<T> {
+export type IMultiDropdownItem<T> = IMultiDropdownValueItem<T> | IMultiDropdownSeparatorItem;
+
+interface IMultiDropdownValueItem<T> {
   /**
    * A unique value for each menu item.
    */
@@ -22,6 +25,14 @@ export interface IMultiDropdownItem<T> {
   attrs?: Partial<IButtonAttrs>;
 }
 
+interface IMultiDropdownSeparatorItem {
+  /**
+   * A unique value for each menu item.
+   */
+  key: string;
+  type: 'separator';
+}
+
 /**
  * A Dropdown, with the ability to select multiple items at once.
  *
@@ -29,6 +40,8 @@ export interface IMultiDropdownItem<T> {
  * - `items`: An array of items to display in the dropdown.
  * - `onchange`: called with array as parameter when selection changes.
  * - `updateOnClose`: only call `onchange` when the dropdown is closed.
+ * - `defaultSelected`: an array of values to be selected by default.
+ * - `ontoggleitem`: called with the item as parameter when an item is toggled. optionally return an array to override the selected items.
  *
  * ### Inherited attrs
  * - `label`: The label to display on the dropdown toggle.
@@ -43,6 +56,11 @@ export default class MultiDropdown<T> extends Dropdown {
 
   oncreate(vnode) {
     super.oncreate(vnode);
+
+    if (Array.isArray(this.attrs.defaultSelected)) {
+      this.selectedItems = new Set(this.attrs.defaultSelected);
+      this.oldSelectedItems = new Set(this.attrs.defaultSelected);
+    }
 
     if (!this.attrs.updateOnClose) return;
 
@@ -92,6 +110,14 @@ export default class MultiDropdown<T> extends Dropdown {
   }
 
   protected getMenuItem(item: IMultiDropdownItem<T>): Mithril.Children {
+    if (item.type === 'separator') {
+      return (
+        <li key={item.key}>
+          <Separator />
+        </li>
+      );
+    }
+
     const selected = this.selectedItems.has(item.value);
 
     const className = classList(item.attrs?.class, item.attrs?.className);
@@ -105,7 +131,7 @@ export default class MultiDropdown<T> extends Dropdown {
           {...item.attrs}
           class={className}
           icon={selected ? 'fas fa-check' : 'fas'}
-          onclick={(e) => {
+          onclick={(e: MouseEvent) => {
             // Stop dropdown closing
             e.stopPropagation();
 
@@ -114,6 +140,13 @@ export default class MultiDropdown<T> extends Dropdown {
               this.selectedItems.delete(item.value);
             } else {
               this.selectedItems.add(item.value);
+            }
+
+            const newItems = this.attrs.ontoggleitem?.(item, Array.from(this.selectedItems));
+            if (Array.isArray(newItems)) {
+              this.selectedItems = new Set(newItems);
+              this.oldSelectedItems = new Set(newItems);
+              m.redraw();
             }
 
             if (!this.attrs.updateOnClose) {
