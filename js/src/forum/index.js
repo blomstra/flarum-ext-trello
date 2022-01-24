@@ -6,3 +6,5 @@ app.initializers.add('blomstra/trello', () => {
   extendDiscussions();
   addModels();
 });
+
+export { default as MultiDropdown } from '../common/MultiDropdown';
