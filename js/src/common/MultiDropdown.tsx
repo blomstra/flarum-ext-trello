@@ -74,7 +74,13 @@ export default class MultiDropdown<T> extends Dropdown {
         new Set([...this.selectedItems, ...this.oldSelectedItems]).size !== this.selectedItems.size // Items differ
       ) {
         // Changes made
-        this.onchange();
+        const newItems = this.onchange();
+
+        if (Array.isArray(newItems)) {
+          this.selectedItems = new Set(newItems);
+          this.oldSelectedItems = new Set(newItems);
+          m.redraw();
+        }
       }
     });
   }
@@ -92,7 +98,7 @@ export default class MultiDropdown<T> extends Dropdown {
   }
 
   protected onchange() {
-    this.attrs.onchange?.(Array.from(this.selectedItems));
+    return this.attrs.onchange?.(Array.from(this.selectedItems));
   }
 
   protected validateItems() {
@@ -150,7 +156,13 @@ export default class MultiDropdown<T> extends Dropdown {
             }
 
             if (!this.attrs.updateOnClose) {
-              this.onchange();
+              const newItems = this.onchange();
+
+              if (Array.isArray(newItems)) {
+                this.selectedItems = new Set(newItems);
+                this.oldSelectedItems = new Set(newItems);
+                m.redraw();
+              }
             }
           }}
         >
