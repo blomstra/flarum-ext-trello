@@ -51,36 +51,21 @@ interface IMultiDropdownSeparatorItem {
 export default class MultiDropdown<T> extends Dropdown {
   protected selectedItems: Set<T> = new Set();
 
-  // Only used when `updateOnClose` is true
-  protected oldSelectedItems: Set<T> = new Set();
-
   oncreate(vnode) {
     super.oncreate(vnode);
 
     if (Array.isArray(this.attrs.defaultSelected)) {
       this.selectedItems = new Set(this.attrs.defaultSelected);
-      this.oldSelectedItems = new Set(this.attrs.defaultSelected);
     }
 
     if (!this.attrs.updateOnClose) return;
 
-    this.$().on('show.bs.dropdown', () => {
-      this.oldSelectedItems = new Set(this.selectedItems);
-    });
-
     this.$().on('hide.bs.dropdown', () => {
-      if (
-        this.selectedItems.size !== this.oldSelectedItems.size || // Different number of items
-        new Set([...this.selectedItems, ...this.oldSelectedItems]).size !== this.selectedItems.size // Items differ
-      ) {
-        // Changes made
-        const newItems = this.onchange();
+      const newItems = this.onchange();
 
-        if (Array.isArray(newItems)) {
-          this.selectedItems = new Set(newItems);
-          this.oldSelectedItems = new Set(newItems);
-          m.redraw();
-        }
+      if (Array.isArray(newItems)) {
+        this.selectedItems = new Set(newItems);
+        m.redraw();
       }
     });
   }
@@ -151,7 +136,6 @@ export default class MultiDropdown<T> extends Dropdown {
             const newItems = this.attrs.ontoggleitem?.(item, Array.from(this.selectedItems));
             if (Array.isArray(newItems)) {
               this.selectedItems = new Set(newItems);
-              this.oldSelectedItems = new Set(newItems);
               m.redraw();
             }
 
@@ -160,7 +144,6 @@ export default class MultiDropdown<T> extends Dropdown {
 
               if (Array.isArray(newItems)) {
                 this.selectedItems = new Set(newItems);
-                this.oldSelectedItems = new Set(newItems);
                 m.redraw();
               }
             }
