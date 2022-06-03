@@ -16,6 +16,7 @@ use Flarum\Discussion\Event\Saving;
 use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Trello\Client as TrelloClient;
 use Trello\Models\Board;
@@ -98,7 +99,11 @@ class SaveTrelloIdToDatabase
 
         $originalPost = $this->translator->trans('blomstra-trello.lib.original_post');
 
-        return "[{$originalPost}]($postUrl) - [{$user->username}]($posterUrl)\n\n".$discussion->posts->first()->content;
+        return Str::limit(
+            "[$originalPost]($postUrl) - [$user->username]($posterUrl)\n\n".$discussion->posts->first()->content,
+            16380,
+            '...'
+        );
     }
 
     private function rememberLastUsedLaneId(string $lane): void
