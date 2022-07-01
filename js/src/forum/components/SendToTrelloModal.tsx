@@ -243,6 +243,7 @@ export default class SendToTrelloModal extends Modal {
     this.tagsWithoutMappings = [];
     this.states.members = null;
     this.disabled = true;
+    this.selected.members = [];
 
     this.setCurrentSelectedBoard(item);
 
