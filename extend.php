@@ -59,4 +59,8 @@ return [
 
     (new Extend\ServiceProvider())
         ->register(TrelloServiceProvider::class),
+
+    (new Extend\Settings())
+        ->default('blomstra-trello.last_used_lane_id', '')
+        ->default('blomstra-trello.default_board_id', ''),
 ];
