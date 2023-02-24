@@ -60,7 +60,7 @@ class ListBoardsController extends AbstractShowController
 
     protected function data(ServerRequestInterface $request, Document $document)
     {
-        RequestUtil::getActor($request)->assertAdmin();
+        RequestUtil::getActor($request)->assertPermission('discussion.addToTrello');
 
         if (!$this->client) {
             return [];
