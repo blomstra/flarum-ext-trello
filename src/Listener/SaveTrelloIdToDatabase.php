@@ -21,8 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Trello\Client as TrelloClient;
 use Trello\Models\Board;
 use Trello\Models\Card;
-use Trello\Models\Label;
-use Trello\Models\Member;
 
 class SaveTrelloIdToDatabase
 {
