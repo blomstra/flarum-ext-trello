@@ -62,27 +62,31 @@ class SaveTrelloIdToDatabase
             $discussion = $event->discussion;
             $event->actor->assertCan('addToTrello', $discussion);
 
-            $card = $this->createTrelloCard($discussion, $attributes['trello']['lane']);
+            $card = $this->createTrelloCard(
+                $discussion,
+                $attributes['trello']['lane'],
+                $attributes['trello']['members'],
+                $this->getLabelIdsToCardBasedOnForumTags($discussion, $attributes['trello']['board']['short_link'])
+            );
 
             if ($card) {
                 $discussion->trello_card_id = $card->shortLink;
 
                 $this->rememberLastUsedLaneId($attributes['trello']['lane']);
                 $this->rememberLastUsedBoardId($attributes['trello']['board']['short_link']);
-
-                $this->attachLabelsToCardBasedOnForumTags($discussion, $card, $attributes['trello']['board']['short_link']);
-                $this->attachMembersToCard($card, $attributes['trello']['members']);
             }
         }
     }
 
-    private function createTrelloCard(Discussion $discussion, string $trelloLane): ?Card
+    private function createTrelloCard(Discussion $discussion, string $trelloLane, array $memberIds, array $labelIds): ?Card
     {
         if ($this->client) {
             $card = new Card($this->client);
             $card->name = $discussion->title;
             $card->desc = $this->prefixContentWithUrl($discussion);
             $card->idList = $trelloLane;
+            $card->idMembers = $memberIds;
+            $card->idLabels = $labelIds;
 
             return $card->save();
         }
@@ -124,8 +128,10 @@ class SaveTrelloIdToDatabase
         }
     }
 
-    private function attachLabelsToCardBasedOnForumTags(Discussion $discussion, Card $card, string $shortLink)
+    private function getLabelIdsToCardBasedOnForumTags(Discussion $discussion, string $shortLink): array
     {
+        $labelIds = [];
+
         if ($this->client) {
             $board = (new Board($this->client))->setId($shortLink)->get();
 
@@ -135,31 +141,18 @@ class SaveTrelloIdToDatabase
                 $boardMappings = Arr::get($mappings, $shortLink);
 
                 if ($boardMappings) {
-                    $discussion->tags->each(function ($tag) use ($boardMappings, $card) {
+                    $discussion->tags->each(function ($tag) use ($boardMappings, &$labelIds) {
                         foreach ($boardMappings as $boardMapping) {
                             if ($boardMapping['tagId'] == $tag->id) {
                                 $labelId = data_get($boardMapping, 'label.id');
-
-                                $label = new Label($this->client);
-                                $label = $label->setId($labelId)->get();
-
-                                $card->addLabel($label);
+                                $labelIds[] = $labelId;
                             }
                         }
                     });
                 }
             }
         }
-    }
 
-    private function attachMembersToCard(Card $card, $members)
-    {
-        if ($this->client) {
-            foreach ($members as $memberId) {
-                $member = (new Member($this->client))->setId($memberId)->get();
-
-                $card->addMember($member);
-            }
-        }
+        return $labelIds;
     }
 }
